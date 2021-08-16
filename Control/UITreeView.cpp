@@ -829,9 +829,9 @@ namespace DuiLib
 		if (_tcsicmp(pControl->GetClass(), _T("TreeNodeUI")) != 0)
 			return -1;
 
-		CTreeNodeUI* pParent = static_cast<CTreeNodeUI*>(GetItemAt(iIndex));
-		if(!pParent)
-			return -1;
+// 		CTreeNodeUI* pParent = static_cast<CTreeNodeUI*>(GetItemAt(iIndex));
+// 		if(!pParent)
+// 			return -1;
 
 		pControl->OnNotify += MakeDelegate(this,&CTreeViewUI::OnDBClickItem);
 		pControl->GetFolderButton()->OnNotify += MakeDelegate(this,&CTreeViewUI::OnFolderChanged);

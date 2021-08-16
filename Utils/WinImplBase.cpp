@@ -287,9 +287,14 @@ LRESULT WindowImplBase::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	m_PaintManager.AddPreMessageFilter(this);
 
 	CDialogBuilder builder;
-	CDuiString strResourcePath=m_PaintManager.GetInstancePath();
-	strResourcePath+=GetSkinFolder().GetData();
-	m_PaintManager.SetResourcePath(strResourcePath.GetData());
+    CDuiString strResourcePath = m_PaintManager.GetResourcePath();
+    if (strResourcePath.IsEmpty())
+    {
+        strResourcePath = m_PaintManager.GetInstancePath();
+        strResourcePath += GetSkinFolder().GetData();
+        m_PaintManager.SetResourcePath(strResourcePath.GetData());
+    }
+	
 
 	switch(GetResourceType())
 	{

@@ -39,6 +39,7 @@ typedef struct tagTListInfoUI
     bool bShowHtml;
     bool bMultiExpandable;
     RECT rcColumnTextPadding[UILIST_MAX_COLUMNS];
+    UINT uColumnTextStyle[UILIST_MAX_COLUMNS];
 } TListInfoUI;
 
 
@@ -276,9 +277,6 @@ public:
     UINT GetControlFlags() const;
 
     void SetEnabled(bool bEnable = true);
-
-	bool IsDragable() const;
-    void SetDragable(bool bDragable);
 	DWORD GetSepWidth() const;
     void SetSepWidth(int iWidth);
 	DWORD GetTextStyle() const;
@@ -310,9 +308,6 @@ public:
     void PaintStatusImage(HDC hDC);
 
 protected:
-    POINT ptLastMouse;
-    bool m_bDragable;
-    UINT m_uButtonState;
     int m_iSepWidth;
     DWORD m_dwTextColor;
     int m_iFont;
@@ -415,6 +410,7 @@ public:
 
     void SetItemTextPadding(int iIndex, RECT& rcPadding);
 
+    void SetItemTextAlign(int iIndex, UINT nAlign);
 protected:
     enum { MAX_LINK = 8 };
     int m_nLinks;
@@ -459,7 +455,7 @@ public:
 
     void DrawItemText(HDC hDC, const RECT& rcItem);    
     void DrawItemBk(HDC hDC, const RECT& rcItem);
-    void SetPos(RECT rc);
+    virtual void SetPos(RECT rc);
 protected:
     int m_iIndex;
     bool m_bSelected;

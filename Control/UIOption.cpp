@@ -3,7 +3,7 @@
 
 namespace DuiLib
 {
-	COptionUI::COptionUI() : m_bSelected(false), m_dwSelectedTextColor(0)
+	COptionUI::COptionUI() : m_bSelected(false), m_dwSelectedTextColor(0), m_iSelectedFont(-1)
 	{
 	}
 
@@ -240,6 +240,7 @@ namespace DuiLib
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetSelectedTextColor(clrColor);
 		}
+        else if (_tcscmp(pstrName, _T("selectedfont")) == 0) SetSelectedFont(_ttoi(pstrValue));
 		else CButtonUI::SetAttribute(pstrName, pstrValue);
 	}
 
@@ -295,12 +296,15 @@ Label_ForeImage:
 			rc.top += m_rcTextPadding.top;
 			rc.bottom -= m_rcTextPadding.bottom;
 
+            int iFont = m_iSelectedFont;
+            if (-1 == iFont) iFont = m_iFont;
+
 			if( m_bShowHtml )
 				CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, IsEnabled()?m_dwTextColor:m_dwDisabledTextColor, \
 				NULL, NULL, nLinks, m_uTextStyle);
 			else
 				CRenderEngine::DrawText(hDC, m_pManager, rc, m_sText, IsEnabled()?m_dwTextColor:m_dwDisabledTextColor, \
-				m_iFont, m_uTextStyle);
+				iFont, m_uTextStyle);
 
 			m_dwTextColor = oldTextColor;
 		}
@@ -311,5 +315,15 @@ Label_ForeImage:
     void COptionUI::DoEvent(TEventUI& event)
     {
         CButtonUI::DoEvent(event);
+    }
+
+    void COptionUI::SetSelectedFont(int index)
+    {
+        m_iSelectedFont = index;
+        Invalidate();
+    }
+    int COptionUI::GetSelectedFont()
+    {
+        return m_iSelectedFont;
     }
 }

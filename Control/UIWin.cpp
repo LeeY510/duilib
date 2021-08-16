@@ -6,7 +6,12 @@ namespace DuiLib
 {
 
     CWndUI::CWndUI() : m_hWnd(NULL)
+        , m_bWndInternVisible(true)
     {
+        m_rcWnd.left = 0;
+        m_rcWnd.top = 0;
+        m_rcWnd.right = 0;
+        m_rcWnd.bottom = 0;
     }
 
     CWndUI::~CWndUI()
@@ -29,7 +34,14 @@ namespace DuiLib
         __super::SetInternVisible(bVisible);
         if (NULL != m_hWnd)
         {
-            ::ShowWindow(m_hWnd, bVisible);
+            if (!bVisible)
+            {
+                ::ShowWindow(m_hWnd, bVisible);
+            }
+            else if (m_bVisible && m_bWndInternVisible)
+            {
+                ::ShowWindow(m_hWnd, bVisible);
+            }
         }
     }
 
@@ -38,7 +50,21 @@ namespace DuiLib
         __super::SetPos(rc);
         if (NULL != m_hWnd)
         {
-            ::SetWindowPos(m_hWnd, NULL, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_NOZORDER | SWP_NOACTIVATE);
+            RECT tmp = rc;
+            if (0 != m_nBorderSize)
+            {
+                tmp.left += m_nBorderSize;
+                tmp.top += m_nBorderSize;
+                tmp.right -= m_nBorderSize;
+                tmp.bottom -= m_nBorderSize;
+            }
+
+            m_rcWnd = tmp;
+            ::SetWindowPos(m_hWnd, NULL, m_rcWnd.left, m_rcWnd.top, m_rcWnd.right - m_rcWnd.left, m_rcWnd.bottom - m_rcWnd.top, SWP_NOZORDER | SWP_NOACTIVATE);
+            RECT rcClient = { 0 };
+            ::GetClientRect(m_hWnd, &rcClient);
+            ::InvalidateRect(m_hWnd, &rcClient, TRUE);
+            ::UpdateWindow(m_hWnd);
         }
     }
 

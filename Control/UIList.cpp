@@ -32,6 +32,7 @@ namespace DuiLib {
     ::ZeroMemory(&m_ListInfo.rcTextPadding, sizeof(m_ListInfo.rcTextPadding));
     ::ZeroMemory(&m_ListInfo.rcColumn, sizeof(m_ListInfo.rcColumn));
     ::ZeroMemory(&m_ListInfo.rcColumnTextPadding, sizeof(m_ListInfo.rcColumnTextPadding));
+    ::ZeroMemory(&m_ListInfo.uColumnTextStyle, sizeof(m_ListInfo.uColumnTextStyle));
 }
 
 LPCTSTR CListUI::GetClass() const
@@ -410,7 +411,7 @@ bool CListUI::SelectItem(int iIndex, bool bTakeFocus)
 
     CControlUI* pControl = GetItemAt(iIndex);
     if (pControl == NULL) return false;
-    if (!pControl->IsVisible()) return false;
+//    if (!pControl->IsVisible()) return false;
     if (!pControl->IsEnabled()) return false;
 
     IListItemUI* pListItem = static_cast<IListItemUI*>(pControl->GetInterface(_T("ListItem")));
@@ -1360,11 +1361,10 @@ SIZE CListHeaderUI::EstimateSize(SIZE szAvailable)
 //
 //
 
-CListHeaderItemUI::CListHeaderItemUI() : m_bDragable(true), m_uButtonState(0), m_iSepWidth(4),
+CListHeaderItemUI::CListHeaderItemUI() : m_iSepWidth(4),
 m_uTextStyle(DT_VCENTER | DT_CENTER | DT_SINGLELINE), m_dwTextColor(0), m_iFont(-1), m_bShowHtml(false)
 {
 	SetTextPadding(CDuiRect(2, 0, 2, 0));
-    ptLastMouse.x = ptLastMouse.y = 0;
     SetMinWidth(16);
 }
 
@@ -1391,17 +1391,6 @@ void CListHeaderItemUI::SetEnabled(bool bEnable)
     if( !IsEnabled() ) {
         m_uButtonState = 0;
     }
-}
-
-bool CListHeaderItemUI::IsDragable() const
-{
-	return m_bDragable;
-}
-
-void CListHeaderItemUI::SetDragable(bool bDragable)
-{
-    m_bDragable = bDragable;
-    if ( !m_bDragable ) m_uButtonState &= ~UISTATE_CAPTURED;
 }
 
 DWORD CListHeaderItemUI::GetSepWidth() const
@@ -2024,7 +2013,10 @@ void CListLabelElementUI::DoEvent(TEventUI& event)
     {
         if (IsEnabled()){
             m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMCLICK);
-            Select(!m_bSelected);
+            if (!m_bSelected)
+            {
+                Select(!m_bSelected);
+            }
             Invalidate();
         }
         return;
@@ -2309,15 +2301,21 @@ void CListTextElementUI::DrawItemText(HDC hDC, const RECT& rcItem)
         rcItem.top += rcPadding.top;
         rcItem.bottom -= rcPadding.bottom;
 
+        UINT uTextStyle = pInfo->uTextStyle;
+        if (0 != pInfo->uColumnTextStyle[i])
+        {
+            uTextStyle = pInfo->uColumnTextStyle[i];
+        }
+
         CDuiString strText;//不使用LPCTSTR，否则限制太多 by cddjr 2011/10/20
         if( pCallback ) strText = pCallback->GetItemText(this, m_iIndex, i);
         else strText.Assign(GetText(i));
         if( pInfo->bShowHtml )
             CRenderEngine::DrawHtmlText(hDC, m_pManager, rcItem, strText.GetData(), iTextColor, \
-                &m_rcLinks[m_nLinks], &m_sLinks[m_nLinks], nLinks, DT_SINGLELINE | pInfo->uTextStyle);
+                &m_rcLinks[m_nLinks], &m_sLinks[m_nLinks], nLinks, DT_SINGLELINE | uTextStyle);
         else
             CRenderEngine::DrawText(hDC, m_pManager, rcItem, strText.GetData(), iTextColor, \
-            pInfo->nFont, pInfo->uTextStyle);
+                pInfo->nFont, uTextStyle);
 
         m_nLinks += nLinks;
         nLinks = lengthof(m_rcLinks) - m_nLinks; 
@@ -2335,6 +2333,16 @@ void CListTextElementUI::SetItemTextPadding(int iIndex, RECT& rcPadding)
     if (iIndex < 0 || iIndex >= pInfo->nColumns) return;
 
     pInfo->rcColumnTextPadding[iIndex] = rcPadding;
+    Invalidate();
+}
+
+void CListTextElementUI::SetItemTextAlign(int iIndex, UINT nAlign)
+{
+    if (iIndex < 0 || m_pOwner == NULL) return;
+    TListInfoUI* pInfo = m_pOwner->GetListInfo();
+    if (iIndex >= pInfo->nColumns) return;
+
+    pInfo->uColumnTextStyle[iIndex] |= nAlign;
     Invalidate();
 }
 
@@ -2667,10 +2675,7 @@ void CListContainerElementUI::SetPos(RECT rc)
 {
     CContainerUI::SetPos(rc);
     if (m_pOwner == NULL) return;
-    if (m_pHeader == NULL)
-    {
-        return;
-    }
+    if (m_pHeader == NULL) return;
 
     int nCount = m_items.GetSize();
     for (int i = 0; i < nCount; i++)

@@ -30,8 +30,14 @@ namespace DuiLib
 
         void PaintText(HDC hDC);
 
+        void SetWndInternVisible(bool bVisible)
+        {
+            m_bWndInternVisible = bVisible;
+        }
 	protected:
 		HWND m_hWnd;
+        RECT m_rcWnd;
+        bool m_bWndInternVisible;
 	};
 }
 

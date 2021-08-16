@@ -21,16 +21,41 @@ public:
     virtual void RemoveAll() = 0;
 };
 
-
 /////////////////////////////////////////////////////////////////////////////////////
 //
 class CScrollBarUI;
+
+enum eDragDirection {
+	eDragTop = 1,
+	eDragDown = 2,	
+	eDragLeft = 4,	
+    eDragRight = 8,
+	eDragLeftTop = 16,
+	eDragLeftDown = 32,
+	eDragRightTop = 64,
+	eDragRightDown = 128,
+	eDragAll = 255,
+};
+
+struct ThumbInfo
+{
+	ThumbInfo() {}
+	ThumbInfo(eDragDirection eDragDir, int iLeft, int iTop, int iRight, int iBottom) {
+		m_eDragDir = eDragDir;
+		m_rc.left = iLeft;
+		m_rc.top = iTop;
+		m_rc.right = iRight;
+		m_rc.bottom = iBottom;
+	}
+	RECT m_rc;
+	eDragDirection m_eDragDir;
+};
 
 class UILIB_API CContainerUI : public CControlUI, public IContainerUI
 {
 public:
     CContainerUI();
-    virtual ~CContainerUI();
+    virtual ~CContainerUI();	
 
 public:
     LPCTSTR GetClass() const;
@@ -65,7 +90,7 @@ public:
 
     virtual int FindSelectable(int iIndex, bool bForward = true) const;
 
-    void SetPos(RECT rc);
+    virtual void SetPos(RECT rc);
     void DoPaint(HDC hDC, const RECT& rcPaint);
 
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
@@ -103,10 +128,27 @@ public:
     virtual CScrollBarUI* GetVerticalScrollBar() const;
     virtual CScrollBarUI* GetHorizontalScrollBar() const;
 
+	virtual void SetEnabled(bool bEnable = true);
+	bool IsDragable() const;
+	void SetDragable(bool bDragable);
+	int GetSeparatorSize() const;
+	void SetSeparatorSize(int iSepSize);
+	int GetDragDirection() const;
+	void SetDragDirection(int iDragDir);
+	void SetSepImmMode(bool bImmediately);
+	bool IsSepImmMode() const;
+    virtual UINT GetControlFlags() const;
+    virtual void DoPostPaint(HDC hDC, const RECT& rcPaint);
+    virtual RECT GetThumbRect(bool bUseNew) const;
+
 protected:
     virtual void SetFloatPos(int iIndex);
     virtual void ProcessScrollBar(RECT rc, int cxRequired, int cyRequired);
-
+    virtual void ProcessScroll(CScrollBarUI* scrollBar, int iRequired, int  iSize, const RECT& rcScrollBarPos);
+private:
+    bool HandleDrag(TEventUI& event);
+    void GetThumbRects();
+	void ClearThumbList();
 protected:
     CStdPtrArray m_items;
     RECT m_rcInset;
@@ -118,6 +160,16 @@ protected:
 
     CScrollBarUI* m_pVerticalScrollBar;
     CScrollBarUI* m_pHorizontalScrollBar;
+
+	bool m_bDragable;//是否可拖动改变大小
+	int  m_iSepSize;//分隔符大小
+	int  m_iDragDir;//拖动方向
+	POINT ptLastMouse;
+	UINT m_uButtonState;
+	bool m_bImmMode;
+	RECT m_rcNewPos;
+	CStdPtrArray m_lstThumb;
+    eDragDirection m_eCurrDargDir;
 };
 
 } // namespace DuiLib

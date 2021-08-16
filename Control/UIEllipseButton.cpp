@@ -62,8 +62,24 @@ namespace DuiLib
         {
             //像素值颜色取点（ pt.x + 1, pt.y + 1）的值
             RECT rc = GetPos();
-            COLORREF color = GetPixel(hDC, rc.left + 1, rc.top + 1);
-
+            COLORREF color = GetPixel(hDC, rc.left + 1, rc.top + 1);//左上角
+            if (CLR_INVALID == color)
+            {
+                color = GetPixel(hDC, rc.right - 1, rc.bottom - 1);//右下角
+                if (CLR_INVALID == color)
+                {
+                    color = GetPixel(hDC, rc.left + 1, rc.bottom - 1);//左下角
+                    if (CLR_INVALID == color)
+                    {
+                        color = GetPixel(hDC, rc.right - 1, rc.top + 1);//右上角
+                        if (CLR_INVALID == color)
+                        {
+                            return m_dwBorderColor;
+                        }
+                    }
+                }
+            }
+            
             BYTE r = GetRValue(color);
             BYTE g = GetGValue(color);
             BYTE b = GetBValue(color);
@@ -78,50 +94,152 @@ namespace DuiLib
     {
     }
 
-    void CEllipseButtonUI::PaintBkImage(HDC hDC)
+    void CEllipseButtonUI::PaintBkColor(HDC hDC)
     {
-        const TImageInfo* data = m_pManager->GetGdiplusImageEx((LPCTSTR)m_sBkImage);
+        Gdiplus::RectF rcDraw((Gdiplus::REAL)m_rcItem.left, (Gdiplus::REAL)m_rcItem.top, (Gdiplus::REAL)m_rcItem.right - m_rcItem.left, (Gdiplus::REAL)m_rcItem.bottom - m_rcItem.top);
+        Gdiplus::SolidBrush texture(Gdiplus::Color(GetAdjustColor(m_dwBackColor)));
+        Gdiplus::Brush* brush = &texture;
+        Gdiplus::Graphics graphics(hDC);
+        graphics.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+        graphics.FillEllipse(brush, rcDraw);
+    }
+    
+    bool CEllipseButtonUI::DrawImage(HDC hDC, LPCTSTR pStrImage, LPCTSTR pStrModify /*= NULL*/)
+    {
+        const TImageInfo* data = m_pManager->GetGdiplusImageEx(pStrImage);
         if (NULL == data)
         {
-            m_pManager->AddGdiplusImage((LPCTSTR)m_sBkImage, NULL, false);
-            data = m_pManager->GetGdiplusImage((LPCTSTR)m_sBkImage);
-        }        
+            m_pManager->AddGdiplusImage(pStrImage, NULL, false);
+            data = m_pManager->GetGdiplusImage(pStrImage);
+        }
 
         if (NULL == data || data->pGdiplusImage->GetLastStatus() != Gdiplus::Ok)
         {
-            return;
+            return false;
         }
 
         //坐标
-        POINT pt = { m_rcItem.left, m_rcItem.top };
-        SIZE sz = { m_rcItem.right - m_rcItem.left, m_rcItem.bottom - m_rcItem.top };
+        int iWidth = m_rcItem.right - m_rcItem.left;
+        int iHeight = m_rcItem.bottom - m_rcItem.top;
+
         if (0 != m_nBorderSize && 1 != m_nBorderSize)
         {
-            pt.x += m_nBorderSize;
-            pt.y += m_nBorderSize;
-            sz.cx -= m_nBorderSize*2;
-            sz.cy -= m_nBorderSize*2;
+            iWidth -= m_nBorderSize * 2;
+            iHeight -= m_nBorderSize * 2;
         }
-         
+
         Gdiplus::Graphics graphics(hDC);
         if (graphics.GetLastStatus() != Gdiplus::Ok)
-            return;
+            return false;
 
         //消除锯齿
         graphics.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+        graphics.SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBicubic);
 
         Gdiplus::GraphicsPath graphicspath;
         if (graphicspath.GetLastStatus() != Gdiplus::Ok)
-            return;
+            return false;
 
-        graphicspath.AddEllipse(pt.x, pt.y, sz.cx, sz.cy);
+        Gdiplus::REAL rBorderSize = m_nBorderSize;
+        Gdiplus::REAL rLeft = m_rcItem.left;
+        Gdiplus::REAL rTop = m_rcItem.top;
+        Gdiplus::REAL rWidth = iWidth;
+        Gdiplus::REAL rHeight = iHeight;
+        if (0 != m_nBorderSize && 1 != m_nBorderSize)
+        {
+            rLeft += rBorderSize / 2 - 1;
+            rTop += rBorderSize / 2 - 1;
+            rWidth += rBorderSize / 2 + 1;
+            rHeight += rBorderSize / 2 + 1;
+        }
+        else
+        {
+            --rWidth;
+            --rHeight;
+        }
+        graphicspath.AddEllipse(rLeft, rTop, rWidth, rHeight);
 
         //设置裁剪圆
         graphics.SetClip(&graphicspath, Gdiplus::CombineModeReplace);
 
         //绘制图像
-        graphics.DrawImage(data->pGdiplusImage, pt.x, pt.y, sz.cx, sz.cy);
+        graphics.DrawImage(data->pGdiplusImage, rLeft, rTop, rWidth, rHeight);
+        return true;
     }
+
+    void CEllipseButtonUI::PaintStatusImage(HDC hDC)
+    {
+        if (IsFocused()) m_uButtonState |= UISTATE_FOCUSED;
+        else m_uButtonState &= ~UISTATE_FOCUSED;
+        if (!IsEnabled()) m_uButtonState |= UISTATE_DISABLED;
+        else m_uButtonState &= ~UISTATE_DISABLED;
+
+        if ((m_uButtonState & UISTATE_DISABLED) != 0) {
+            if (!m_sDisabledImage.IsEmpty())
+            {
+                if (!DrawImage(hDC, (LPCTSTR)m_sDisabledImage)) m_sDisabledImage.Empty();
+                else goto Label_ForeImage;
+            }
+        }
+        else if ((m_uButtonState & UISTATE_PUSHED) != 0) {
+            if (!m_sPushedImage.IsEmpty()) {
+                if (!DrawImage(hDC, (LPCTSTR)m_sPushedImage)){
+                    m_sPushedImage.Empty();
+                }
+                if (!m_sPushedForeImage.IsEmpty())
+                {
+                    if (!DrawImage(hDC, (LPCTSTR)m_sPushedForeImage))
+                        m_sPushedForeImage.Empty();
+                    return;
+                }
+                else goto Label_ForeImage;
+            }
+        }
+        else if ((m_uButtonState & UISTATE_HOT) != 0) {
+            if (!m_sHotImage.IsEmpty()) {
+                if (!DrawImage(hDC, (LPCTSTR)m_sHotImage)){
+                    m_sHotImage.Empty();
+                }
+                if (!m_sHotForeImage.IsEmpty()) {
+                    if (!DrawImage(hDC, (LPCTSTR)m_sHotForeImage))
+                        m_sHotForeImage.Empty();
+                    return;
+                }
+                else goto Label_ForeImage;
+            }
+            else if (m_dwHotBkColor != 0) {
+                Gdiplus::RectF rcDraw((Gdiplus::REAL)m_rcItem.left, (Gdiplus::REAL)m_rcItem.top, (Gdiplus::REAL)m_rcItem.right - m_rcItem.left, (Gdiplus::REAL)m_rcItem.bottom - m_rcItem.top);
+                Gdiplus::SolidBrush texture(Gdiplus::Color(GetAdjustColor(m_dwHotBkColor)));
+                Gdiplus::Brush* brush = &texture;
+                Gdiplus::Graphics graphics(hDC);
+                graphics.SetSmoothingMode(Gdiplus::SmoothingModeHighQuality);
+                graphics.FillEllipse(brush, rcDraw);
+                return;
+            }
+        }
+        else if ((m_uButtonState & UISTATE_FOCUSED) != 0) {
+            if (!m_sFocusedImage.IsEmpty()) {
+                if (!DrawImage(hDC, (LPCTSTR)m_sFocusedImage)) m_sFocusedImage.Empty();
+                else goto Label_ForeImage;
+            }
+        }
+
+        if (!m_sNormalImage.IsEmpty()) {
+            if (!DrawImage(hDC, (LPCTSTR)m_sNormalImage)) m_sNormalImage.Empty();
+            else goto Label_ForeImage;
+        }
+
+        if (!m_sForeImage.IsEmpty())
+            goto Label_ForeImage;
+
+        return;
+
+    Label_ForeImage:
+        if (!m_sForeImage.IsEmpty()) {
+            if (!DrawImage(hDC, (LPCTSTR)m_sForeImage)) m_sForeImage.Empty();
+        }
+    }
+    
 
     bool CEllipseButtonUI::PointInRegion(const POINT& pt)
     {
@@ -130,6 +248,11 @@ namespace DuiLib
 
     void CEllipseButtonUI::PaintBorder(HDC hDC)
     {
+        if (m_sBkImage.IsEmpty() && (!m_nBorderSize || !m_dwBorderColor))
+        {
+            return;
+        }
+
         Gdiplus::Pen myPen(GetPenColor(hDC));//默认宽度为1
         if (myPen.GetLastStatus() != Gdiplus::Ok)
         {
@@ -154,11 +277,13 @@ namespace DuiLib
         int height = m_rcItem.bottom - m_rcItem.top;
         if (0 != m_nBorderSize && 1 != m_nBorderSize)
         {
-            int offset = m_nBorderSize % 2;
-            x += m_nBorderSize / 2 + offset;
-            y += m_nBorderSize / 2 + offset;
-            width -= m_nBorderSize * 2 - offset;
-            height -= m_nBorderSize * 2 - offset;
+            width -= m_nBorderSize;
+            height -= m_nBorderSize;
+        }
+        else
+        {
+            --width;
+            --height;
         }
 
         graphics.DrawEllipse(&myPen,x, y, width, height);

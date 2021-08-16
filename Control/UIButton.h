@@ -47,7 +47,7 @@ namespace DuiLib
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
 		void PaintText(HDC hDC);
-		void PaintStatusImage(HDC hDC);
+		virtual void PaintStatusImage(HDC hDC);
 
 	protected:
 		UINT m_uButtonState;

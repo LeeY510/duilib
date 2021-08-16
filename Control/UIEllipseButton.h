@@ -1,11 +1,6 @@
 #ifndef __UIELIPSEBUTTON_H__
 #define __UIELIPSEBUTTON_H__
 
-#pragma once
-
-#include <gdiplus.h>
-#pragma comment( lib, "GdiPlus.lib" )
-
 namespace DuiLib
 {
     class UILIB_API CEllipseButtonUI :  public CButtonUI
@@ -21,9 +16,13 @@ namespace DuiLib
 
         void SetBkImage(LPCTSTR pStrImage);
 
-        virtual void PaintBkImage(HDC hDC);
+        virtual void PaintBkColor(HDC hDC);
 
         virtual bool PointInRegion(const POINT& pt);
+
+        virtual bool DrawImage(HDC hDC, LPCTSTR pStrImage, LPCTSTR pStrModify = NULL);
+
+        virtual void PaintStatusImage(HDC hDC);
 
         void DoInit();
 

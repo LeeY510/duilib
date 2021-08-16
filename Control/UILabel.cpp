@@ -15,7 +15,7 @@ namespace DuiLib
 		return Color(255, r, g, b);
 	}
 
-	CLabelUI::CLabelUI() : m_uTextStyle(DT_VCENTER), m_dwTextColor(0), 
+	CLabelUI::CLabelUI() : m_uTextStyle(DT_VCENTER | DT_SINGLELINE), m_dwTextColor(0),
 		m_dwDisabledTextColor(0),
 		m_iFont(-1),
 		m_bShowHtml(false),
@@ -322,18 +322,18 @@ namespace DuiLib
 			if( IsEnabled() ) {
 				if( m_bShowHtml )
 					CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, m_dwTextColor, \
-					NULL, NULL, nLinks, DT_SINGLELINE | m_uTextStyle);
+					NULL, NULL, nLinks, m_uTextStyle);
 				else
 					CRenderEngine::DrawText(hDC, m_pManager, rc, m_sText, m_dwTextColor, \
-					m_iFont, DT_SINGLELINE | m_uTextStyle);
+					m_iFont, m_uTextStyle);
 			}
 			else {
 				if( m_bShowHtml )
 					CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, m_dwDisabledTextColor, \
-					NULL, NULL, nLinks, DT_SINGLELINE | m_uTextStyle);
+					NULL, NULL, nLinks, m_uTextStyle);
 				else
 					CRenderEngine::DrawText(hDC, m_pManager, rc, m_sText, m_dwDisabledTextColor, \
-					m_iFont, DT_SINGLELINE | m_uTextStyle);
+					m_iFont, m_uTextStyle);
 			}
 		}
 		else

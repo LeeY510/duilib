@@ -46,7 +46,8 @@ namespace DuiLib
 		void PaintStatusImage(HDC hDC);
 		void PaintText(HDC hDC);
         void DoEvent(TEventUI& event);
-
+        void SetSelectedFont(int index);
+        int GetSelectedFont();
 	protected:
 		bool			m_bSelected;
 		CDuiString		m_sGroupName;
@@ -57,6 +58,7 @@ namespace DuiLib
 		CDuiString		m_sSelectedImage;
 		CDuiString		m_sSelectedHotImage;
 		CDuiString		m_sForeImage;
+        int		        m_iSelectedFont;
 	};
 
 } // namespace DuiLib

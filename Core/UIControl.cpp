@@ -27,6 +27,7 @@ m_nBorderSize(0),
 m_nBorderStyle(PS_SOLID),
 m_nTooltipWidth(300),
 m_OwnerDrawFun(NULL),
+m_pOwnerDrawParam(NULL),
 m_bSpecialCtrl(false)
 {
     m_cXY.cx = m_cXY.cy = 0;
@@ -1027,7 +1028,7 @@ void CControlUI::DoPaint(HDC hDC, const RECT& rcPaint)
 
     if (NULL != m_OwnerDrawFun)
     {
-        m_OwnerDrawFun(this, hDC, rcPaint);
+        m_OwnerDrawFun(this, hDC, rcPaint, m_pOwnerDrawParam);
     }
 }
 
@@ -1097,13 +1098,15 @@ void CControlUI::PaintBorder(HDC hDC)
 					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.top,GetAdjustColor(m_dwBorderColor),m_nBorderStyle);
 				}
 				if(m_rcBorderSize.right > 0){
-					rcBorder		= m_rcItem;
-					rcBorder.left	= m_rcItem.right;
+                    rcBorder = m_rcItem;
+                    rcBorder.right -= m_rcBorderSize.right;
+                    rcBorder.left = rcBorder.right;
 					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.right,GetAdjustColor(m_dwBorderColor),m_nBorderStyle);
 				}
 				if(m_rcBorderSize.bottom > 0){
 					rcBorder		= m_rcItem;
-					rcBorder.top	= m_rcItem.bottom;
+                    rcBorder.bottom -= m_rcBorderSize.bottom;
+                    rcBorder.top = rcBorder.bottom;
 					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.bottom,GetAdjustColor(m_dwBorderColor),m_nBorderStyle);
 				}
 			}
@@ -1228,9 +1231,10 @@ void CControlUI::SetBorderStyle( int nStyle )
 	Invalidate();
 }
 
-void CControlUI::SetOwnerDraw(void* pOwnerDrawFun)
+void CControlUI::SetOwnerDraw(void* pOwnerDrawFun, void* pOwnerDrawParam)
 {
     m_OwnerDrawFun = (OwnerDraw)pOwnerDrawFun;
+    m_pOwnerDrawParam = pOwnerDrawParam;
 }
 
 } // namespace DuiLib

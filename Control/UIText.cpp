@@ -105,9 +105,10 @@ namespace DuiLib
 
 	SIZE CTextUI::EstimateSize(SIZE szAvailable)
     {
-        if (m_bAutoCalcWidth)
+        RECT rcText = { 0, 0, m_cxyFixed.cx == 0 ? 9999 : m_cxyFixed.cx, m_cxyFixed.cy == 0 ? 9999 : m_cxyFixed.cy };
+
+        if (!m_cxyFixed.cy || !m_cxyFixed.cx)
         {
-            RECT rcText = { 0, 0, m_bAutoCalcWidth ? szAvailable.cx : m_cxyFixed.cx, m_cxyFixed.cy == 0 ? 9999 : m_cxyFixed.cy };
             if (m_bShowHtml)
             {
                 int nLinks = 0;
@@ -121,10 +122,11 @@ namespace DuiLib
             SIZE szXY = { rcText.right - rcText.left + m_rcTextPadding.left + m_rcTextPadding.right,
                 rcText.bottom - rcText.top + m_rcTextPadding.top + m_rcTextPadding.bottom };
 
-            m_cxyFixed.cx = szXY.cx;
+            if (!m_cxyFixed.cx) m_cxyFixed.cx = szXY.cx;
+
+            if (!m_cxyFixed.cy) m_cxyFixed.cy = szXY.cy;
         }
 
-        if (m_cxyFixed.cy == 0) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 4);
         return CControlUI::EstimateSize(szAvailable);
     }
 

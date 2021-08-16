@@ -426,6 +426,10 @@ namespace DuiLib
 			}
 		}
 		else if( (m_uButtonState & UISTATE_HOT) != 0 ) {
+            if (m_dwHotBkColor != 0) {
+                CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwHotBkColor));
+            }
+
 			if( !m_sHotImage.IsEmpty() ) {
 				if( !DrawImage(hDC, (LPCTSTR)m_sHotImage) ){
 					m_sHotImage.Empty();
@@ -436,10 +440,6 @@ namespace DuiLib
 					return;
 				}
 				else goto Label_ForeImage;
-			}
-			else if(m_dwHotBkColor != 0) {
-				CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwHotBkColor));
-				return;
 			}
 		}
 		else if( (m_uButtonState & UISTATE_FOCUSED) != 0 ) {

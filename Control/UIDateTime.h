@@ -24,6 +24,8 @@ namespace DuiLib
 
 		void UpdateText();
 
+        void SetText(LPCTSTR pstrText);
+
 		void DoEvent(TEventUI& event);
 
 	protected:

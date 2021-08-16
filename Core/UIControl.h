@@ -9,7 +9,7 @@ namespace DuiLib {
 //
 
 typedef CControlUI* (CALLBACK* FINDCONTROLPROC)(CControlUI*, LPVOID);
-typedef void (CALLBACK* OwnerDraw)(CControlUI*, HDC, const RECT&);
+typedef void (CALLBACK* OwnerDraw)(CControlUI*, HDC, const RECT&, void*);
 
 class UILIB_API CControlUI
 {
@@ -51,7 +51,7 @@ public:
     void SetColorHSL(bool bColorHSL);
     SIZE GetBorderRound() const;
     void SetBorderRound(SIZE cxyRound);
-    bool DrawImage(HDC hDC, LPCTSTR pStrImage, LPCTSTR pStrModify = NULL);
+    virtual bool DrawImage(HDC hDC, LPCTSTR pStrImage, LPCTSTR pStrModify = NULL);
 
 	//边框相关
 	int GetBorderSize() const;
@@ -166,7 +166,7 @@ public:
 	void SetVirtualWnd(LPCTSTR pstrValue);
 	CDuiString GetVirtualWnd() const;
 
-    virtual void SetOwnerDraw(void* pOwnerDrawFun);
+    virtual void SetOwnerDraw(void* pOwnerDrawFun, void* pOwnerDrawParam);
     //是否是异形控件
     virtual bool IsSpecialCtrl()
     {
@@ -228,6 +228,7 @@ protected:
     RECT m_rcPaint;
 	RECT m_rcBorderSize;
     OwnerDraw m_OwnerDrawFun;//自绘函数
+    void* m_pOwnerDrawParam;
     bool m_bSpecialCtrl;
 };
 

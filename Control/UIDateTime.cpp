@@ -23,7 +23,7 @@ namespace DuiLib
 
 		LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 		LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-		//LRESULT OnEditChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+		LRESULT OnEditChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	protected:
 		CDateTimeUI* m_pOwner;
@@ -105,28 +105,7 @@ namespace DuiLib
 			PostMessage(WM_CLOSE);
 			return lRes;
 		}
-		//	else if( uMsg == OCM_COMMAND ) {
-		// 		if( GET_WM_COMMAND_CMD(wParam, lParam) == EN_CHANGE ) lRes = OnEditChanged(uMsg, wParam, lParam, bHandled);
-		// 		else if( GET_WM_COMMAND_CMD(wParam, lParam) == EN_UPDATE ) {
-		// 			RECT rcClient;
-		// 			::GetClientRect(m_hWnd, &rcClient);
-		// 			::InvalidateRect(m_hWnd, &rcClient, FALSE);
-		// 		}
-		//	}
-		//	else if( uMsg == WM_KEYDOWN && TCHAR(wParam) == VK_RETURN ) {
-		// 		m_pOwner->GetManager()->SendNotify(m_pOwner, DUI_MSGTYPE_RETURN);
-		//	}
-		// 		else if( uMsg == OCM__BASE + WM_CTLCOLOREDIT  || uMsg == OCM__BASE + WM_CTLCOLORSTATIC ) {
-		// 			if( m_pOwner->GetNativeEditBkColor() == 0xFFFFFFFF ) return NULL;
-		// 			::SetBkMode((HDC)wParam, TRANSPARENT);
-		// 			DWORD dwTextColor = m_pOwner->GetTextColor();
-		// 			::SetTextColor((HDC)wParam, RGB(GetBValue(dwTextColor),GetGValue(dwTextColor),GetRValue(dwTextColor)));
-		// 			if( m_hBkBrush == NULL ) {
-		// 				DWORD clrColor = m_pOwner->GetNativeEditBkColor();
-		// 				m_hBkBrush = ::CreateSolidBrush(RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
-		// 			}
-		// 			return (LRESULT)m_hBkBrush;
-		// 		}
+		
 		else bHandled = FALSE;
 		if( !bHandled ) return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
 		return lRes;
@@ -145,20 +124,20 @@ namespace DuiLib
 		return lRes;
 	}
 
-	// LRESULT CDateTimeWnd::OnEditChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-	// {
-	// 	if( !m_bInit ) return 0;
-	// 	if( m_pOwner == NULL ) return 0;
-	// 	// Copy text back
-	// 	int cchLen = ::GetWindowTextLength(m_hWnd) + 1;
-	// 	LPTSTR pstr = static_cast<LPTSTR>(_alloca(cchLen * sizeof(TCHAR)));
-	// 	ASSERT(pstr);
-	// 	if( pstr == NULL ) return 0;
-	// 	::GetWindowText(m_hWnd, pstr, cchLen);
-	// 	m_pOwner->m_sText = pstr;
-	// 	m_pOwner->GetManager()->SendNotify(m_pOwner, DUI_MSGTYPE_TEXTCHANGED);
-	// 	return 0;
-	// }
+    LRESULT CDateTimeWnd::OnEditChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+    {
+        if (!m_bInit) return 0;
+        if (m_pOwner == NULL) return 0;
+        // Copy text back
+        int cchLen = ::GetWindowTextLength(m_hWnd) + 1;
+        LPTSTR pstr = static_cast<LPTSTR>(_alloca(cchLen * sizeof(TCHAR)));
+        ASSERT(pstr);
+        if (pstr == NULL) return 0;
+        ::GetWindowText(m_hWnd, pstr, cchLen);
+        m_pOwner->m_sText = pstr;
+        m_pOwner->GetManager()->SendNotify(m_pOwner, DUI_MSGTYPE_TEXTCHANGED);
+        return 0;
+    }
 
 	//////////////////////////////////////////////////////////////////////////
 	//
@@ -213,7 +192,7 @@ namespace DuiLib
 		{
 			CDuiString sText;
 			sText.SmallFormat(_T("%4d-%02d-%02d"),
-				m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay, m_sysTime.wHour, m_sysTime.wMinute);
+				m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay);
 			SetText(sText);
             if (NULL != m_pManager)
             {
@@ -221,6 +200,26 @@ namespace DuiLib
             }
 		}
 	}
+
+    void CDateTimeUI::SetText(LPCTSTR pstrText)
+    {
+        if (m_sText == pstrText) return;
+
+        int year = 0;
+        int month = 0;
+        int day = 0;
+        swscanf(pstrText, L"%04d-%02d-%02d", &year, &month, &day);
+
+        m_sysTime.wYear = year;
+        m_sysTime.wMonth = month;
+        m_sysTime.wDay = day;
+
+        CLabelUI::SetText(pstrText);
+        if (NULL != m_pManager)
+        {
+            m_pManager->SendNotify(this, DUI_MSGTYPE_TEXTCHANGED);
+        }
+    }
 
 	void CDateTimeUI::DoEvent(TEventUI& event)
 	{

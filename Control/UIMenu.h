@@ -1,137 +1,192 @@
-#ifndef __UIMENU_H__
+/************************************************************************/
+/*  Desc  ：菜单
+Author ：Skilla（QQ：848861075）
+Data   ：2014. 12.22                           
+
+
+标签:MenuContainer（继承自CContainerUI）  菜单容器    属性interval（int）：各级菜单间隙      keyevent（bool）：是否开启键盘事件
+标签:MenuUI （继承自CListUI）                   菜单         属性major（bool） ：是否为主菜单      bktrans（bool）  ：是否开启窗口透明
+标签:MenuItem(继承自CListContainerElementUI)  菜单项  属性  command(string) 菜单项命令id，不可重复（菜单结束时会返回）   extendmenu（string）    子菜单名称（这个属性是菜单级联的关键）  
+标签:StaticMenuItem(继承自CListContainerElementUI) 静态菜单项  （包括菜单分割线，其他和菜单项无关的控件）
+
+
+*/
+/************************************************************************/
+#ifndef  __UIMENU_H__
 #define __UIMENU_H__
 
-#ifdef _MSC_VER
 #pragma once
-#endif
-
-#include "../Utils/observer_impl_base.hpp"
-
-#pragma warning( disable: 4251 )
-
 namespace DuiLib {
-class CMenuUI;
-class CListUI;
-class CMenuWnd;
-class CMenuElementUI;
-class CListContainerElementUI;
-/////////////////////////////////////////////////////////////////////////////////////
-//
-struct ContextMenuParam
-{
-	// 1: remove all
-	// 2: remove the sub menu
-	WPARAM wParam;
-	HWND hWnd;
-};
 
-enum MenuAlignment
-{
-	eMenuAlignment_Left = 1 << 1,
-	eMenuAlignment_Top = 1 << 2,
-	eMenuAlignment_Right = 1 << 3,
-	eMenuAlignment_Bottom = 1 << 4,
-};
-
-typedef class ObserverImpl<BOOL, ContextMenuParam> ContextMenuObserver;
-typedef class ReceiverImpl<BOOL, ContextMenuParam> ContextMenuReceiver;
-typedef void (*PMODIFYMENUFUNC)(CMenuUI *, void*);
-typedef void(*PMENUCLICK)(CControlUI*, void*);
-extern ContextMenuObserver s_context_menu_observer;
-
-class UILIB_API CMenuUI : public CListUI
-{
-public:
-	CMenuUI();
-	~CMenuUI();
-
-    LPCTSTR GetClass() const;
-    LPVOID GetInterface(LPCTSTR pstrName);
-
-	virtual void DoEvent(TEventUI& event);
-    virtual bool Add(CControlUI* pControl);
-    virtual bool AddAt(CControlUI* pControl, int iIndex);
-    virtual int GetItemIndex(CControlUI* pControl) const;
-    virtual bool SetItemIndex(CControlUI* pControl, int iIndex);
-    virtual bool Remove(CControlUI* pControl);
-
-	SIZE EstimateSize(SIZE szAvailable);
-	void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-	void SetOwnWnd(CMenuWnd *pWnd);
-	CMenuWnd *GetOwnWnd();
-private:
-	CMenuWnd *m_pOwnWnd;
-};
-
-/////////////////////////////////////////////////////////////////////////////////////
-
-class UILIB_API CMenuWnd : public CWindowWnd,public ContextMenuReceiver
-{
-	friend CMenuElementUI;
-public:
-	CMenuWnd(HWND hParent = NULL);
-  
-	void Init(POINT point,STRINGorID xml, LPCTSTR pSkinType = _T("xml"));
-	void Init(CControlUI* pTrigger, CMenuElementUI* pOwner, POINT point, STRINGorID xml, LPCTSTR pSkinType = _T("xml"));
-
-	///> 用于动态修改Menu
-	void SetModifyMenuFunc(PMODIFYMENUFUNC pfunModifyMenu, void* params);
-	PMODIFYMENUFUNC GetModifyMenuFunc();
-    void* GetModifyMenuParam();
-
-	///> 用于响应Menu事件
-	void SetMenuClickFunc(PMENUCLICK pMenuClick, void* params);
-	PMENUCLICK GetMenuClickFunc();
-    void* GetMenuClickParam();
-
-	CControlUI* GetTrigger()
+	struct MenuReturn
 	{
-		return m_pTrigger;
-	}
-protected:
-	void Init(CMenuElementUI* pOwner, STRINGorID xml, LPCTSTR pSkinType, POINT point);
-    LPCTSTR GetWindowClassName() const;
-    void OnFinalMessage(HWND hWnd);
-    LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-	BOOL Receive(ContextMenuParam param);
+		bool    bExit;
+		CDuiString command;
+	};
 
-protected:
-	HWND m_hParent;
-	POINT m_BasedPoint;
-	STRINGorID m_xml;
-	CDuiString m_sType;
-    CPaintManagerUI m_pm;
-    CMenuElementUI* m_pOwner;
-    CMenuUI* m_pLayout;
-	CControlUI* m_pTrigger;
-	PMODIFYMENUFUNC m_pfunModifyMenu;
-    void* m_pModifyParam;
-	PMENUCLICK	m_pMenuClick;
-    void* m_pMenuClickParam;
-};
+	class CMenuUI;
+	class UILIB_API CMenuElementUI : public CListContainerElementUI
+	{
+	public:
+		CMenuElementUI();
+		//初始化
+		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+		LPVOID GetInterface(LPCTSTR pstrName);
+		void SetMenuOwner(CMenuUI* owner);
+		void SetExtendMenu(CMenuUI* pMenu);
+		//获取属性
+		CDuiString GetExtendMenuName();
+		CMenuUI* GetExtendMenu();
+		CDuiString GetMenuCmd();
+		bool IsHaveExtend();
+		bool IsExtendMenuShow();
+		//设置属性
+		void SetExtenMenuShow(bool b);
+		//响应事件
+		void DoEvent(TEventUI& event);
+		void DoPaint(HDC hDC, const RECT& rcPaint);
+		//功能
+		void ShowSubMenu();
+		void HideSubMenu();
 
-class UILIB_API CMenuElementUI : public CListContainerElementUI
-{
-	friend CMenuWnd;
-public:
-    CMenuElementUI();
-	~CMenuElementUI();
+	protected:
+		CDuiString      m_ExtendMenuName;        //子菜单name
+		CDuiString      m_MenuCmd;                   //菜单命令
+		CMenuUI*        m_pMenuOwner;               //菜单Owner
+		CMenuUI*        m_pExtendMenu;              //子菜单
+		bool            m_bHaveExtend;               //是否含有子菜单
+		bool            m_bExtendMenuShow;       //子菜单是否显示了
+	};
 
-protected:
-    LPCTSTR GetClass() const;
-    LPVOID GetInterface(LPCTSTR pstrName);
-    void DoPaint(HDC hDC, const RECT& rcPaint);
-	void DrawItemText(HDC hDC, const RECT& rcItem);
-	SIZE EstimateSize(SIZE szAvailable);
-	bool Activate();
-	void DoEvent(TEventUI& event);
-	CMenuWnd* GetMenuWnd();
-	void CreateMenuWnd();
 
-protected:
-	CMenuWnd* m_pWindow;
-};
+	class UILIB_API CStaticMenuElementUI :public CListContainerElementUI
+	{
+	public:
+		LPVOID GetInterface(LPCTSTR pstrName);
+		void DoPaint(HDC hDC, const RECT& rcPaint);
+	};
 
-} // namespace DuiLib
+	class CMenuUI;
+	class CMenuWnd :public CWindowWnd
+	{
+	public:
+		CMenuWnd(void);
+		~CMenuWnd(void);
+		virtual LPCTSTR GetWindowClassName() const;
+		LRESULT OnNcActivate(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled);
+		LRESULT OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+		virtual void OnFinalMessage(HWND hWnd);
+		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+		void BindControl(CControlUI* pControl);
+		void UnBindControl(CControlUI* pControl);
+		void ShowMenuWnd(bool b);
+		void AddNotifier(INotifyUI* pNotify);
+		void SetMenuOwner(CMenuUI* pOwner);
+		void SetBktrans(bool b);
 
-#endif // __UIMENU_H__
+	protected:
+		CPaintManagerUI m_PaintManager;
+		CMenuUI*          m_pOwner;
+	};
+
+	class CDuiMenu;
+	class UILIB_API CMenuUI :public CListUI, public INotifyUI
+	{
+	public:
+		CMenuUI();
+		~CMenuUI();
+		LPVOID GetInterface(LPCTSTR pstrName);
+		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+		void SetSuperMenu(CMenuUI* pSuper);
+		void SetOwnerTree(CDuiMenu* pMenuTree);
+		CDuiMenu* GetOwnerTree();
+
+		void InitMenu(HWND ownerWnd);
+		bool Add(CControlUI* pControl);
+
+		bool  IsMajor();
+		bool IsExtenMenuShow();
+		CMenuUI* GetCurExtendMenu();
+		CMenuWnd* GetMenuWnd();
+
+
+		void ShowMenu(POINT p);
+		void HideMenu();
+		void OnItemHover(CControlUI* pControl);
+		void OnItemLeave(CControlUI* pControl);
+		void OnMenuItemClick(CControlUI* pControl);
+		void Notify(TNotifyUI& msg) {}
+
+
+		virtual void OnItemHot(CMenuElementUI* pMenuItem);
+		virtual void OnItemUnHot(CMenuElementUI* pMenuItem);
+
+		void SetCurItem(CMenuElementUI* pMenuItem);
+		CMenuElementUI* GetCurItem();
+
+		void ShowSubMenu(CMenuElementUI* pMenuItem);
+		CMenuElementUI* GetNextItem();
+		CMenuElementUI* GetPrevItem();
+
+		//响应键盘事件
+		void OnVkLeft();
+		void OnVkRight();
+		void OnVkUp();
+		void OnVkDown();
+		void OnVkReturn();
+
+	protected:
+		bool            m_bMajor;
+		bool            m_bSubMenuShow;
+		CMenuUI*    m_pCurSubMenu;
+		CMenuWnd* m_pMenuWnd;
+		CDuiMenu*   m_pOwnerTree;
+		CMenuElementUI*  m_pCurItem;
+		CMenuUI*    m_pSuperMenu;
+	};
+
+
+	class UILIB_API CMenuContainer : public CContainerUI
+	{
+	public:
+		CMenuContainer();
+		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+		int GetInterval();
+		bool IsKeyEvent()
+		{
+			return m_bKeyEvent;
+		}
+	protected:
+		int  m_nInterval;
+		bool m_bKeyEvent;
+	};
+
+
+	class UILIB_API CDuiMenu : public IDialogBuilderCallback
+	{
+	public:
+		CDuiMenu(LPCTSTR xml);
+		~CDuiMenu();
+		CControlUI* CreateControl(LPCTSTR pstrClass);
+		LPCTSTR TrackPopupMenu(HWND hwndParent, int x, int y);
+		void DestroyMenu();
+		bool IsMenuWnd(HWND hwnd);
+		int   RunMenu();
+		void ExitMenu(LPCTSTR cmd);
+		void SetKeyEventMenu(CMenuUI* pMenu);
+		CMenuContainer* GetMenuContainer();
+	protected:
+		void LoadFromXml(LPCTSTR xmlName);
+		CMenuUI* FindMenuByName(LPCTSTR pName);
+
+		CDuiString                m_xmlName;
+		HWND                      m_hWndOwner;
+		CMenuUI*                  m_pMajorMenu;
+		CMenuUI*                  m_pKeyEvent;
+		CMenuContainer*           m_menus;
+		bool                      m_bMenusExsit;
+		MenuReturn                m_menuRet;
+	};
+
+}
+#endif

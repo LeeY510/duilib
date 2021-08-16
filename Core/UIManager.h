@@ -273,7 +273,7 @@ public:
     const CStdStringPtrMap& GetDefaultAttribultes() const;
     void RemoveAllDefaultAttributeList();
 
-    bool AttachDialog(CControlUI* pControl);
+    bool AttachDialog(CControlUI* pControl, bool bAutoDeleteControl = true);
     bool InitControls(CControlUI* pControl, CControlUI* pParent = NULL);
     void ReapObjects(CControlUI* pControl);
 
@@ -338,7 +338,7 @@ public:
 	void UsedVirtualWnd(bool bUsed);
 
     CShadowUI* GetShadow();
-
+	void SetUnfocusPaintWindow(bool b);
 private:
     static CControlUI* CALLBACK __FindControlFromNameHash(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromCount(CControlUI* pThis, LPVOID pData);
@@ -428,6 +428,9 @@ private:
     static CStdPtrArray m_aPlugins;
 
     CShadowUI m_shadow;
+
+	bool m_bAutoDeleteControls;
+	bool m_bUnfocusPaintWindow;
 
 public:
 	static CDuiString m_pStrDefaultFontName;

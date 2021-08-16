@@ -19,6 +19,8 @@ DuiLib::CWebBrowserUI::CWebBrowserUI()
 
 bool DuiLib::CWebBrowserUI::DoCreateControl()
 {
+    if (NULL != m_pWebBrowser2) return true;
+
 	if (!CActiveXUI::DoCreateControl())
 		return false;
 	GetManager()->AddTranslateAccelerator(this);
