@@ -1,15 +1,10 @@
 /************************************************************************/
 /*  Desc  ：菜单
-Author ：Skilla（QQ：848861075）
-Data   ：2014. 12.22                           
-
 
 标签:MenuContainer（继承自CContainerUI）  菜单容器    属性interval（int）：各级菜单间隙      keyevent（bool）：是否开启键盘事件
 标签:MenuUI （继承自CListUI）                   菜单         属性major（bool） ：是否为主菜单      bktrans（bool）  ：是否开启窗口透明
 标签:MenuItem(继承自CListContainerElementUI)  菜单项  属性  command(string) 菜单项命令id，不可重复（菜单结束时会返回）   extendmenu（string）    子菜单名称（这个属性是菜单级联的关键）  
 标签:StaticMenuItem(继承自CListContainerElementUI) 静态菜单项  （包括菜单分割线，其他和菜单项无关的控件）
-
-
 */
 /************************************************************************/
 #ifndef  __UIMENU_H__
