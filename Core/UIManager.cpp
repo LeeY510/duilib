@@ -93,9 +93,7 @@ m_bOffscreenPaint(true),
 m_bAlphaBackground(false),
 m_bUsedVirtualWnd(false),
 m_nOpacity(255),
-m_pParentResourcePM(NULL),
-m_bAutoDeleteControls(false),
-m_bUnfocusPaintWindow(false)
+m_pParentResourcePM(NULL)
 {
     m_dwDefaultDisabledColor = 0xFFA7A6AA;
     m_dwDefaultFontColor = 0xFF000000;
@@ -143,10 +141,7 @@ CPaintManagerUI::~CPaintManagerUI()
     for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) delete static_cast<CControlUI*>(m_aDelayedCleanup[i]);
     for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) delete static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
     m_mNameHash.Resize(0);
-	if (m_bAutoDeleteControls)
-	{
-		delete m_pRoot;
-	}
+	delete m_pRoot;
 
     ::DeleteObject(m_DefaultFontInfo.hFont);
     RemoveAllFonts();
@@ -589,20 +584,12 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
                 m_pEventClick->Event(event);
             }
 
-			//无焦点窗口不做任何处理
-			if (!m_bUnfocusPaintWindow)
-			{
-				SetFocus(NULL);
-			}
+		    SetFocus(NULL);
 
             // Hmmph, the usual Windows tricks to avoid
             // focus loss...
             HWND hwndParent = GetWindowOwner(m_hWndPaint);
-			//无焦点窗口不做任何处理
-			if (!m_bUnfocusPaintWindow)
-			{
-				if (hwndParent != NULL) ::SetFocus(hwndParent);
-			}
+			if (hwndParent != NULL) ::SetFocus(hwndParent);
         }
         break;
     case WM_ERASEBKGND:
@@ -888,10 +875,8 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             // when Win32 child windows are placed on the dialog
             // and we need to remove them on focus change).
 			//无焦点窗口不做任何处理
-		   if (!m_bUnfocusPaintWindow)
-		   {
 			::SetFocus(m_hWndPaint);
-		   }
+
             POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
             m_ptLastMousePos = pt;
             CControlUI* pControl = FindControl(pt);
@@ -913,11 +898,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         break;
     case WM_LBUTTONDBLCLK:
         {
-		//无焦点窗口不做任何处理
-		if (!m_bUnfocusPaintWindow)
-		{
 			::SetFocus(m_hWndPaint);
-		}
             POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
             m_ptLastMousePos = pt;
             CControlUI* pControl = FindControl(pt);
@@ -954,11 +935,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         break;
     case WM_RBUTTONDOWN:
         {
-		//无焦点窗口不做任何处理
-		if (!m_bUnfocusPaintWindow)
-		{
 			::SetFocus(m_hWndPaint);
-		}
             POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
             m_ptLastMousePos = pt;
             CControlUI* pControl = FindControl(pt);
@@ -1133,7 +1110,7 @@ void CPaintManagerUI::Invalidate(RECT& rcItem)
     ::InvalidateRect(m_hWndPaint, &rcItem, FALSE);
 }
 
-bool CPaintManagerUI::AttachDialog(CControlUI* pControl, bool bAutoDeleteControl)
+bool CPaintManagerUI::AttachDialog(CControlUI* pControl)
 {
     ASSERT(::IsWindow(m_hWndPaint));
     // Reset any previous attachment
@@ -1154,8 +1131,6 @@ bool CPaintManagerUI::AttachDialog(CControlUI* pControl, bool bAutoDeleteControl
     m_bUpdateNeeded = true;
     m_bFirstLayout = true;
     m_bFocusNeeded = true;
-
-	m_bAutoDeleteControls = bAutoDeleteControl;
 
     m_shadow.Create(this);
 
@@ -1287,11 +1262,7 @@ void CPaintManagerUI::SetFocus(CControlUI* pControl)
 {
     // Paint manager window has focus?
     HWND hFocusWnd = ::GetFocus();
-	//无焦点窗口不做任何处理
-	if (!m_bUnfocusPaintWindow)
-	{
-		if (hFocusWnd != m_hWndPaint && pControl != m_pFocus) ::SetFocus(m_hWndPaint);
-	}
+    if (hFocusWnd != m_hWndPaint && pControl != m_pFocus) ::SetFocus(m_hWndPaint);
   
     // Already has focus?
     if( pControl == m_pFocus ) return;
@@ -1325,11 +1296,7 @@ void CPaintManagerUI::SetFocus(CControlUI* pControl)
 
 void CPaintManagerUI::SetFocusNeeded(CControlUI* pControl)
 {
-	//无焦点窗口不做任何处理
-	if (!m_bUnfocusPaintWindow)
-	{
-		::SetFocus(m_hWndPaint);
-	}
+	::SetFocus(m_hWndPaint);
     if( pControl == NULL ) return;
     if( m_pFocus != NULL ) {
         TEventUI event = { 0 };
@@ -2514,11 +2481,6 @@ void CPaintManagerUI::UsedVirtualWnd(bool bUsed)
 CShadowUI* CPaintManagerUI::GetShadow()
 {
     return &m_shadow;
-}
-
-void CPaintManagerUI::SetUnfocusPaintWindow(bool b)
-{
-	m_bUnfocusPaintWindow = b;
 }
 
 } // namespace DuiLib

@@ -54,6 +54,7 @@ union DuiMessageMapFunctions
 #define DUI_MSGTYPE_KILLFOCUS              (_T("killfocus"))
 #define DUI_MSGTYPE_ITEMCLICK 		   	   (_T("itemclick"))
 #define DUI_MSGTYPE_TABSELECT              (_T("tabselect"))
+#define DUI_MSGTYPE_MENUCLOSE              (_T("menuclose"))
 
 #define DUI_MSGTYPE_ITEMSELECT 		   	   (_T("itemselect"))
 #define DUI_MSGTYPE_ITEMEXPAND             (_T("itemexpand"))
