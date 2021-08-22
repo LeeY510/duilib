@@ -27,6 +27,7 @@ namespace DuiLib
 		pDottedLine		= new CLabelUI();
 		pCheckBox		= new CCheckBoxUI();
 		pItemButton		= new COptionUI();
+        pIcon           = new CControlUI();
 
 		this->SetFixedHeight(18);
 		this->SetFixedWidth(250);
@@ -34,10 +35,12 @@ namespace DuiLib
 		pDottedLine->SetFixedWidth(2);
 		pCheckBox->SetFixedWidth(GetFixedHeight());
 		pItemButton->SetAttribute(_T("align"),_T("left"));
+        pIcon->SetFixedWidth(GetFixedHeight());
 
 		pDottedLine->SetVisible(false);
 		pCheckBox->SetVisible(false);
 		pItemButton->SetMouseEnabled(false);
+        pIcon->SetVisible(false);
 
 		if(_ParentNode)
 		{
@@ -52,6 +55,7 @@ namespace DuiLib
 		pHoriz->Add(pDottedLine);
 		pHoriz->Add(pFolderButton);
 		pHoriz->Add(pCheckBox);
+        pHoriz->Add(pIcon);
 		pHoriz->Add(pItemButton);
 		Add(pHoriz);
 	}
@@ -467,6 +471,8 @@ namespace DuiLib
 			pFolderButton->ApplyAttributeList(pstrValue);
 		else if(_tcscmp(pstrName, _T("checkboxattr")) == 0 )
 			pCheckBox->ApplyAttributeList(pstrValue);
+        else if (_tcscmp(pstrName, _T("iconattr")) == 0)
+            pIcon->ApplyAttributeList(pstrValue);
 		else if(_tcscmp(pstrName, _T("itemattr")) == 0 )
 			pItemButton->ApplyAttributeList(pstrValue);
 		else if(_tcscmp(pstrName, _T("itemtextcolor")) == 0 ){
@@ -726,6 +732,16 @@ namespace DuiLib
 		return m_dwSelItemHotTextColor;
 	}
 
+    void CTreeNodeUI::SetVisibleIcon(bool _IsVisibled)
+    {
+        pIcon->SetVisible(_IsVisibled);
+    }
+
+    bool CTreeNodeUI::GetVisibleIcon()
+    {
+        return pIcon->IsVisible();
+    }
+
 	/*****************************************************************************/
 	/*****************************************************************************/
 	/*****************************************************************************/
@@ -792,8 +808,8 @@ namespace DuiLib
 		pControl->GetFolderButton()->OnNotify += MakeDelegate(this,&CTreeViewUI::OnFolderChanged);
 		pControl->GetCheckBox()->OnNotify += MakeDelegate(this,&CTreeViewUI::OnCheckBoxChanged);
 
-		pControl->SetVisibleFolderBtn(m_bVisibleFolderBtn);
-		pControl->SetVisibleCheckBtn(m_bVisibleCheckBtn);
+		pControl->SetVisibleFolderBtn(m_bVisibleFolderBtn && pControl->GetVisibleFolderBtn());
+		pControl->SetVisibleCheckBtn(m_bVisibleCheckBtn && pControl->GetVisibleCheckBtn());
 		if(m_uItemMinWidth > 0)
 			pControl->SetMinWidth(m_uItemMinWidth);
 

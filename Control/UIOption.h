@@ -32,6 +32,9 @@ namespace DuiLib
 		void SetSelectedBkColor(DWORD dwBkColor);
 		DWORD GetSelectBkColor();
 
+        void SetSelectedBorderColor(DWORD dwBorderColor);
+        DWORD GetSelectBorderColor();
+
 		LPCTSTR GetForeImage();
 		void SetForeImage(LPCTSTR pStrImage);
 
@@ -48,12 +51,15 @@ namespace DuiLib
         void DoEvent(TEventUI& event);
         void SetSelectedFont(int index);
         int GetSelectedFont();
+
+        virtual void PaintBorder(HDC hDC);
 	protected:
 		bool			m_bSelected;
 		CDuiString		m_sGroupName;
 
 		DWORD			m_dwSelectedBkColor;
 		DWORD			m_dwSelectedTextColor;
+        DWORD			m_dwSelectedBorderColor;
 
 		CDuiString		m_sSelectedImage;
 		CDuiString		m_sSelectedHotImage;

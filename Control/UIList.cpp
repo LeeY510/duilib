@@ -2548,8 +2548,10 @@ void CListContainerElementUI::DoEvent(TEventUI& event)
     {
         if( IsEnabled() ){
             m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMCLICK);
-            Select(!m_bSelected);
-            Invalidate();
+            if (!m_bSelected) {
+                Select(!m_bSelected);
+                Invalidate();
+            }            
         }
         return;
     }

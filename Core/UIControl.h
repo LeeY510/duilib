@@ -57,7 +57,7 @@ public:
 	int GetBorderSize() const;
 	void SetBorderSize(int nSize);
 	DWORD GetBorderColor() const;
-	void SetBorderColor(DWORD dwBorderColor);
+	virtual void SetBorderColor(DWORD dwBorderColor);
 
 	void SetBorderSize(RECT rc);
 	int GetLeftBorderSize() const;

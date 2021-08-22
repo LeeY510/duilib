@@ -196,6 +196,16 @@ namespace DuiLib
 		return m_dwSelectedBkColor;
 	}
 
+    void COptionUI::SetSelectedBorderColor(DWORD dwBorderColor)
+    {
+        m_dwSelectedBorderColor = dwBorderColor;
+    }
+
+    DWORD COptionUI::GetSelectBorderColor()
+    {
+        return m_dwSelectedBorderColor;
+    }
+
 	LPCTSTR COptionUI::GetForeImage()
 	{
 		return m_sForeImage;
@@ -241,6 +251,12 @@ namespace DuiLib
 			SetSelectedTextColor(clrColor);
 		}
         else if (_tcscmp(pstrName, _T("selectedfont")) == 0) SetSelectedFont(_ttoi(pstrValue));
+        else if (_tcscmp(pstrName, _T("selectedbordercolor")) == 0) {
+            if (*pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+            LPTSTR pstr = NULL;
+            DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+            SetSelectedTextColor(clrColor);
+        }
 		else CButtonUI::SetAttribute(pstrName, pstrValue);
 	}
 
@@ -325,5 +341,11 @@ Label_ForeImage:
     int COptionUI::GetSelectedFont()
     {
         return m_iSelectedFont;
+    }
+
+    void COptionUI::PaintBorder(HDC hDC)
+    {
+        CControlUI::PaintBorder(hDC);
+        
     }
 }

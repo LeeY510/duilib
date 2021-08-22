@@ -65,7 +65,8 @@ namespace DuiLib
 
 		int			 GetTreeIndex();
 		int			 GetNodeIndex();
-
+        void	SetVisibleIcon(bool _IsVisibled);
+        bool	GetVisibleIcon();
 	private:
 		CTreeNodeUI* GetLastNode();
 		CTreeNodeUI* CalLocation(CTreeNodeUI* _pTreeNodeUI);
@@ -91,6 +92,7 @@ namespace DuiLib
 		CLabelUI*				pDottedLine;
 		CCheckBoxUI*			pCheckBox;
 		COptionUI*				pItemButton;
+        CControlUI*             pIcon;
 
 		CTreeNodeUI*			pParentTreeNode;
 
