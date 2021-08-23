@@ -58,7 +58,8 @@ namespace DuiLib
 
     DWORD CEllipseButtonUI::GetPenColor(HDC hDC)
     {
-        if (0 == m_nBorderSize || 0 == m_dwBorderColor || (m_bHotBorder && ((m_uButtonState & UISTATE_HOT) == 0)))
+        DWORD dwBorderColor = GetBorderColor();
+        if (0 == m_nBorderSize || 0 == dwBorderColor || (m_bHotBorder && ((m_uButtonState & UISTATE_HOT) == 0)))
         {
             //像素值颜色取点（ pt.x + 1, pt.y + 1）的值
             RECT rc = GetPos();
@@ -74,7 +75,7 @@ namespace DuiLib
                         color = GetPixel(hDC, rc.right - 1, rc.top + 1);//右上角
                         if (CLR_INVALID == color)
                         {
-                            return m_dwBorderColor;
+                            return dwBorderColor;
                         }
                     }
                 }
@@ -87,7 +88,7 @@ namespace DuiLib
             return Color(255, r, g, b).GetValue();
         }      
 
-        return m_dwBorderColor;
+        return dwBorderColor;
     }
 
     void CEllipseButtonUI::DoInit()
@@ -248,7 +249,8 @@ namespace DuiLib
 
     void CEllipseButtonUI::PaintBorder(HDC hDC)
     {
-        if (m_sBkImage.IsEmpty() && (!m_nBorderSize || !m_dwBorderColor))
+        DWORD dwBorderColor = GetBorderColor();
+        if (m_sBkImage.IsEmpty() && (!m_nBorderSize || !dwBorderColor))
         {
             return;
         }

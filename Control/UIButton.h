@@ -48,7 +48,8 @@ namespace DuiLib
 
 		void PaintText(HDC hDC);
 		virtual void PaintStatusImage(HDC hDC);
-
+        void SetHotBorderColor(DWORD dwHotBorderColor);
+        virtual DWORD GetBorderColor() const;
 	protected:
 		UINT m_uButtonState;
 
@@ -56,6 +57,7 @@ namespace DuiLib
 		DWORD m_dwHotTextColor;
 		DWORD m_dwPushedTextColor;
 		DWORD m_dwFocusedTextColor;
+        DWORD m_dwHotBorderColor;
 
 		CDuiString m_sNormalImage;
 		CDuiString m_sHotImage;

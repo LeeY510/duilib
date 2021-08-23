@@ -9,6 +9,7 @@ namespace DuiLib
 		, m_dwPushedTextColor(0)
 		, m_dwFocusedTextColor(0)
 		, m_dwHotBkColor(0)
+        , m_dwHotBorderColor(0)
 	{
 		m_uTextStyle = DT_SINGLELINE | DT_VCENTER | DT_CENTER;
 	}
@@ -358,6 +359,13 @@ namespace DuiLib
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetFocusedTextColor(clrColor);
 		}
+        else if (_tcscmp(pstrName, _T("hotbordercolor")) == 0)
+        {
+            if (*pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+            LPTSTR pstr = NULL;
+            DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+            SetHotBorderColor(clrColor);
+        }
         
 		else CLabelUI::SetAttribute(pstrName, pstrValue);
 	}
@@ -464,4 +472,18 @@ Label_ForeImage:
 			if( !DrawImage(hDC, (LPCTSTR)m_sForeImage) ) m_sForeImage.Empty();
 		}
 	}
+
+    void CButtonUI::SetHotBorderColor(DWORD dwHotBorderColor)
+    {
+        m_dwHotBorderColor = dwHotBorderColor;
+    }
+
+    DWORD CButtonUI::GetBorderColor() const
+    {
+        if (m_dwHotBorderColor != 0 && (m_uButtonState & UISTATE_HOT) != 0) {
+            return m_dwHotBorderColor;
+        }
+
+        return CLabelUI::GetBorderColor();
+    }
 }

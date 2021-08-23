@@ -1070,14 +1070,15 @@ void CControlUI::PaintText(HDC hDC)
 
 void CControlUI::PaintBorder(HDC hDC)
 {
-	if(m_dwBorderColor != 0 || m_dwFocusBorderColor != 0)
+    DWORD dwBorderColor = GetBorderColor();
+	if(dwBorderColor != 0 || m_dwFocusBorderColor != 0)
 	{
 		if(m_nBorderSize > 0 && ( m_cxyBorderRound.cx > 0 || m_cxyBorderRound.cy > 0 ))//»­Ô²½Ç±ß¿ò
 		{
 			if (IsFocused() && m_dwFocusBorderColor != 0)
 				CRenderEngine::DrawRoundRect(hDC, m_rcItem, m_nBorderSize, m_cxyBorderRound.cx, m_cxyBorderRound.cy, GetAdjustColor(m_dwFocusBorderColor));
 			else
-				CRenderEngine::DrawRoundRect(hDC, m_rcItem, m_nBorderSize, m_cxyBorderRound.cx, m_cxyBorderRound.cy, GetAdjustColor(m_dwBorderColor));
+				CRenderEngine::DrawRoundRect(hDC, m_rcItem, m_nBorderSize, m_cxyBorderRound.cx, m_cxyBorderRound.cy, GetAdjustColor(dwBorderColor));
 		}
 		else
 		{
@@ -1090,28 +1091,28 @@ void CControlUI::PaintBorder(HDC hDC)
 				if(m_rcBorderSize.left > 0){
 					rcBorder		= m_rcItem;
 					rcBorder.right	= m_rcItem.left;
-					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.left,GetAdjustColor(m_dwBorderColor),m_nBorderStyle);
+					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.left,GetAdjustColor(dwBorderColor),m_nBorderStyle);
 				}
 				if(m_rcBorderSize.top > 0){
 					rcBorder		= m_rcItem;
 					rcBorder.bottom	= m_rcItem.top;
-					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.top,GetAdjustColor(m_dwBorderColor),m_nBorderStyle);
+					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.top,GetAdjustColor(dwBorderColor),m_nBorderStyle);
 				}
 				if(m_rcBorderSize.right > 0){
                     rcBorder = m_rcItem;
                     rcBorder.right -= m_rcBorderSize.right;
                     rcBorder.left = rcBorder.right;
-					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.right,GetAdjustColor(m_dwBorderColor),m_nBorderStyle);
+					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.right,GetAdjustColor(dwBorderColor),m_nBorderStyle);
 				}
 				if(m_rcBorderSize.bottom > 0){
 					rcBorder		= m_rcItem;
                     rcBorder.bottom -= m_rcBorderSize.bottom;
                     rcBorder.top = rcBorder.bottom;
-					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.bottom,GetAdjustColor(m_dwBorderColor),m_nBorderStyle);
+					CRenderEngine::DrawLine(hDC,rcBorder,m_rcBorderSize.bottom,GetAdjustColor(dwBorderColor),m_nBorderStyle);
 				}
 			}
 			else if(m_nBorderSize > 0)
-				CRenderEngine::DrawRect(hDC, m_rcItem, m_nBorderSize, GetAdjustColor(m_dwBorderColor));
+				CRenderEngine::DrawRect(hDC, m_rcItem, m_nBorderSize, GetAdjustColor(dwBorderColor));
 		}
 	}
 }

@@ -3,7 +3,10 @@
 
 namespace DuiLib
 {
-	COptionUI::COptionUI() : m_bSelected(false), m_dwSelectedTextColor(0), m_iSelectedFont(-1)
+	COptionUI::COptionUI() : m_bSelected(false)
+        , m_dwSelectedTextColor(0)
+        , m_iSelectedFont(-1)
+        , m_dwSelectedBorderColor(0)
 	{
 	}
 
@@ -104,7 +107,7 @@ namespace DuiLib
 	{
 		CControlUI::SetEnabled(bEnable);
 		if( !IsEnabled() ) {
-			if( m_bSelected ) m_uButtonState = UISTATE_SELECTED;
+			if( m_bSelected ) m_uButtonState |= UISTATE_SELECTED;
 			else m_uButtonState = 0;
 		}
 	}
@@ -196,16 +199,6 @@ namespace DuiLib
 		return m_dwSelectedBkColor;
 	}
 
-    void COptionUI::SetSelectedBorderColor(DWORD dwBorderColor)
-    {
-        m_dwSelectedBorderColor = dwBorderColor;
-    }
-
-    DWORD COptionUI::GetSelectBorderColor()
-    {
-        return m_dwSelectedBorderColor;
-    }
-
 	LPCTSTR COptionUI::GetForeImage()
 	{
 		return m_sForeImage;
@@ -251,11 +244,12 @@ namespace DuiLib
 			SetSelectedTextColor(clrColor);
 		}
         else if (_tcscmp(pstrName, _T("selectedfont")) == 0) SetSelectedFont(_ttoi(pstrValue));
-        else if (_tcscmp(pstrName, _T("selectedbordercolor")) == 0) {
+        else if (_tcscmp(pstrName, _T("selectedbordercolor")) == 0)
+        {
             if (*pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
             LPTSTR pstr = NULL;
             DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
-            SetSelectedTextColor(clrColor);
+            SetSelectedBorderColor(clrColor);
         }
 		else CButtonUI::SetAttribute(pstrName, pstrValue);
 	}
@@ -343,9 +337,16 @@ Label_ForeImage:
         return m_iSelectedFont;
     }
 
-    void COptionUI::PaintBorder(HDC hDC)
+    void COptionUI::SetSelectedBorderColor(DWORD dwSelectedBorderColor)
     {
-        CControlUI::PaintBorder(hDC);
-        
+        m_dwSelectedBorderColor = dwSelectedBorderColor;
+    }
+
+    DWORD COptionUI::GetBorderColor() const
+    {
+        if (m_dwSelectedBorderColor != 0 && (m_uButtonState & UISTATE_SELECTED) != 0) {
+            return m_dwSelectedBorderColor;
+        }
+        return CButtonUI::GetBorderColor();
     }
 }

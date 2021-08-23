@@ -30,10 +30,7 @@ namespace DuiLib
 		DWORD GetSelectedTextColor();
 
 		void SetSelectedBkColor(DWORD dwBkColor);
-		DWORD GetSelectBkColor();
-
-        void SetSelectedBorderColor(DWORD dwBorderColor);
-        DWORD GetSelectBorderColor();
+		DWORD GetSelectBkColor();        
 
 		LPCTSTR GetForeImage();
 		void SetForeImage(LPCTSTR pStrImage);
@@ -52,7 +49,8 @@ namespace DuiLib
         void SetSelectedFont(int index);
         int GetSelectedFont();
 
-        virtual void PaintBorder(HDC hDC);
+        void SetSelectedBorderColor(DWORD dwSelectedBorderColor);
+        virtual DWORD GetBorderColor() const;
 	protected:
 		bool			m_bSelected;
 		CDuiString		m_sGroupName;
