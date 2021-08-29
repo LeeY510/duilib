@@ -112,4 +112,5 @@
 #include "Control/UIMenu.h"
 #include "Control/UIEllipseButton.h"
 //#include "Control/UIFlash.h"
+#include "Control/UITabs.h"
 

@@ -372,6 +372,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
                 if( _tcscmp(pstrClass, DUI_CTR_EDIT) == 0 )                   pControl = new CEditUI;
                 else if( _tcscmp(pstrClass, DUI_CTR_LIST) == 0 )              pControl = new CListUI;
                 else if( _tcscmp(pstrClass, DUI_CTR_TEXT) == 0 )              pControl = new CTextUI;
+                else if (_tcscmp(pstrClass, DUI_CTR_TABS) == 0)               pControl = new CTabsUI;
                 break;
             case 5:
                 if( _tcscmp(pstrClass, DUI_CTR_COMBO) == 0 )                  pControl = new CComboUI;
@@ -386,6 +387,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
             case 7:
                 if( _tcscmp(pstrClass, DUI_CTR_CONTROL) == 0 )                pControl = new CControlUI;
                 else if( _tcscmp(pstrClass, DUI_CTR_ACTIVEX) == 0 )           pControl = new CActiveXUI;
+                else if (_tcscmp(pstrClass, DUI_CTR_TABPANE) == 0)            pControl = new CTabPaneUI;                
                 break;
             case 8:
                 if( _tcscmp(pstrClass, DUI_CTR_PROGRESS) == 0 )               pControl = new CProgressUI;
