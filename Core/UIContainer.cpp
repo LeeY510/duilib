@@ -552,22 +552,74 @@ namespace DuiLib
     void CContainerUI::SetPos(RECT rc)
     {
         CControlUI::SetPos(rc);
+
         if (m_items.IsEmpty()) return;
+        rc = m_rcItem;
+        
+        // Adjust for inset
         rc.left += m_rcInset.left;
         rc.top += m_rcInset.top;
         rc.right -= m_rcInset.right;
         rc.bottom -= m_rcInset.bottom;
+        if (m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible()) rc.right -= m_pVerticalScrollBar->GetFixedWidth();
+        if (m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible()) rc.bottom -= m_pHorizontalScrollBar->GetFixedHeight();
 
-        for (int it = 0; it < m_items.GetSize(); it++) {
+        SIZE szAvailable = { rc.right - rc.left, rc.bottom - rc.top };
+
+        int iPosY = rc.top;
+        if (m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible()) {
+            iPosY -= m_pVerticalScrollBar->GetScrollPos();
+        }
+        int iPosX = rc.left;
+        if (m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible()) {
+            iPosX -= m_pHorizontalScrollBar->GetScrollPos();
+        }
+
+        int cyNeeded = 0;
+        int cxNeeded = 0;
+
+        for (int it = 0; it < m_items.GetSize(); ++it) {
             CControlUI* pControl = static_cast<CControlUI*>(m_items[it]);
             if (!pControl->IsVisible()) continue;
             if (pControl->IsFloat()) {
                 SetFloatPos(it);
+                continue;
             }
-            else {
-                pControl->SetPos(rc); // 所有非float子控件放大到整个客户区
+
+            SIZE sz = pControl->EstimateSize(szAvailable);
+
+            SIZE szXY = pControl->GetFixedXY();
+            if ((sz.cx + szXY.cx) > cxNeeded) {
+                cxNeeded = sz.cx + szXY.cx;
             }
+
+            if ((sz.cy + szXY.cy) > cyNeeded) {
+                cyNeeded = sz.cy + szXY.cy;
+            }
+
+            RECT rcCtrl = { szXY.cx, szXY.cy, 0, 0};
+
+            rcCtrl.left += iPosX;
+            rcCtrl.top += iPosY;
+            
+            if (sz.cx == 0) {
+                sz.cx = szAvailable.cx;
+            }
+            if (sz.cy == 0) {
+                sz.cy = szAvailable.cy;
+            }
+            rcCtrl.right = rcCtrl.left + sz.cx;
+            rcCtrl.bottom = rcCtrl.top + sz.cy;
+
+            pControl->SetPos(rcCtrl);
         }
+
+        cxNeeded += m_rcInset.left + m_rcInset.right;
+        cyNeeded += m_rcInset.top + m_rcInset.bottom;
+        cxNeeded = MAX(cxNeeded, 0);
+        cyNeeded = MAX(cyNeeded, 0);
+
+        ProcessScrollBar(rc, cxNeeded, cyNeeded);
     }
 
     void CContainerUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)

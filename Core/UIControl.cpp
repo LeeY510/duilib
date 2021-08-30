@@ -372,8 +372,9 @@ void CControlUI::SetPos(RECT rc)
             else m_cXY.cx = m_rcItem.right - rcParentPos.right;
             if( m_cXY.cy >= 0 ) m_cXY.cy = m_rcItem.top - rcParentPos.top;
             else m_cXY.cy = m_rcItem.bottom - rcParentPos.bottom;
+
             m_cxyFixed.cx = m_rcItem.right - m_rcItem.left;
-            m_cxyFixed.cy = m_rcItem.bottom - m_rcItem.top;
+            m_cxyFixed.cy = m_rcItem.bottom - m_rcItem.top;            
         }
     }
 
@@ -1001,12 +1002,6 @@ SIZE CControlUI::EstimateSize(SIZE szAvailable)
 void CControlUI::DoPaint(HDC hDC, const RECT& rcPaint)
 {
     if( !::IntersectRect(&m_rcPaint, &rcPaint, &m_rcItem) ) return;
-
-    if (m_sName == _T("ctrl_image"))
-    {
-        int a = 0;
-        int b = a;
-    }
 
     // »æÖÆÑ­Ðò£º±³¾°ÑÕÉ«->±³¾°Í¼->×´Ì¬Í¼->ÎÄ±¾->±ß¿ò
     if( m_cxyBorderRound.cx > 0 || m_cxyBorderRound.cy > 0 ) {
