@@ -22,7 +22,7 @@ namespace DuiLib
 	public:
 		LPCTSTR GetClass() const;
 		LPVOID	GetInterface(LPCTSTR pstrName);
-		void	DoEvent(TEventUI& event);
+		virtual void	DoEvent(TEventUI& event);
 		void	Invalidate();
 		bool	Select(bool bSelect = true);
 
@@ -37,7 +37,6 @@ namespace DuiLib
 		void	CheckBoxSelected(bool _Selected);
 		bool	IsCheckBoxSelected() const;
 		bool	IsHasChild() const;
-		long	GetTreeLevel() const;
 		bool	AddChildNode(CTreeNodeUI* _pTreeNodeUI);
 		bool	RemoveAt(CTreeNodeUI* _pTreeNodeUI);
 		void	SetParentNode(CTreeNodeUI* _pParentTreeNode);
@@ -76,7 +75,7 @@ namespace DuiLib
 		CLabelUI*				GetDottedLine() const {return pDottedLine;};
 		CCheckBoxUI*			GetCheckBox() const {return pCheckBox;};
 		COptionUI*				GetItemButton() const {return pItemButton;};
-
+        CControlUI*				GetIcon() const { return pIcon; };
 	private:
 		long	m_iTreeLavel;
 		bool	m_bIsVisable;
