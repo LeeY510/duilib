@@ -4,9 +4,10 @@
 namespace DuiLib
 {
 	COptionUI::COptionUI() : m_bSelected(false)
-        , m_dwSelectedTextColor(0)
-        , m_iSelectedFont(-1)
+        , m_dwSelectedBkColor(0)
+        , m_dwSelectedTextColor(0)        
         , m_dwSelectedBorderColor(0)
+        , m_iSelectedFont(-1)
 	{
 	}
 
@@ -272,7 +273,6 @@ namespace DuiLib
 		else if( (m_uButtonState & UISTATE_SELECTED) != 0 ) {
             if (m_dwSelectedBkColor != 0) {
                 CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwSelectedBkColor));
-                return;
             }
 
 			if( !m_sSelectedImage.IsEmpty() ) {
