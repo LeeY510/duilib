@@ -597,6 +597,9 @@ namespace DuiLib
 
         , m_iItemfont (-1)
         , m_bItemVisibleTips(true)
+
+        , m_pTabPaneCloseCb(NULL)
+        , m_pCbParam(NULL)
     {
         ::ZeroMemory(&m_rcItemInset, sizeof(m_rcItemInset));
         ::ZeroMemory(&m_rcItemTextPadding, sizeof(m_rcItemTextPadding));        
@@ -982,6 +985,10 @@ namespace DuiLib
         {
             CButtonUI* pClose = (CButtonUI*)pMsg->pSender;
             CTabPaneUI* pItem = (CTabPaneUI*)pClose->GetParent();
+            if (m_pTabPaneCloseCb) {
+                if (!m_pTabPaneCloseCb(pItem, m_pCbParam))
+                    return true;
+            }
             bool bIsSelected = pItem->IsSelected();
             this->Remove(pItem);
 
@@ -1038,5 +1045,10 @@ namespace DuiLib
             }
         }
         m_itemOptStack.Add(pItem);
+    }
+
+    void CTabsUI::SetTabPaneCloseCb(TabPaneCloseCb pTabPaneCloseCb, void* pCbParam){
+        m_pTabPaneCloseCb = pTabPaneCloseCb;
+        m_pCbParam = pCbParam;
     }
 }

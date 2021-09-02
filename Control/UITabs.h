@@ -108,6 +108,8 @@ namespace DuiLib
         CButtonUI*			m_pClose;
     };
 
+    typedef bool(*TabPaneCloseCb)(CControlUI*, void*);
+
     class UILIB_API CTabsUI : public CHorizontalLayoutUI
     {
     public:
@@ -150,6 +152,8 @@ namespace DuiLib
         void SetItemIconImage(LPCTSTR pStrImage);
 
         void PushItemSelected(CControlUI* pItem);
+
+        void SetTabPaneCloseCb(TabPaneCloseCb pTabPaneCloseCb, void* pCbParam);
     private:
         void InitTabPane(CControlUI* pControl);
     private:
@@ -177,6 +181,9 @@ namespace DuiLib
         CDuiString  m_strGroupName;
 
         CStdPtrArray m_itemOptStack;
+
+        TabPaneCloseCb m_pTabPaneCloseCb;
+        void*       m_pCbParam;
     };
 }
 
