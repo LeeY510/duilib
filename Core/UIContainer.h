@@ -164,7 +164,7 @@ protected:
 	bool m_bDragable;//是否可拖动改变大小
 	int  m_iSepSize;//分隔符大小
 	int  m_iDragDir;//拖动方向
-	POINT ptLastMouse;
+	POINT m_ptLastMouse;
 	UINT m_uButtonState;
 	bool m_bImmMode;
 	RECT m_rcNewPos;

@@ -21,7 +21,7 @@ namespace DuiLib
         m_bImmMode(false),
         m_iDragDir(eDragAll)
     {
-        ptLastMouse.x = ptLastMouse.y = 0;
+        m_ptLastMouse.x = m_ptLastMouse.y = 0;
         ::ZeroMemory(&m_rcInset, sizeof(m_rcInset));
         ::ZeroMemory(&m_rcNewPos, sizeof(m_rcNewPos));
     }
@@ -1104,7 +1104,7 @@ namespace DuiLib
                 if (::PtInRect(&rcSeparator, event.ptMouse))
                 {
                     m_uButtonState |= UISTATE_CAPTURED;
-                    ptLastMouse = event.ptMouse;
+                    m_ptLastMouse = event.ptMouse;
                     m_rcNewPos = m_rcItem;
                     m_eCurrDargDir = info->m_eDragDir;
                     if (!m_bImmMode && m_pManager) m_pManager->AddPostPaint(this);
@@ -1126,9 +1126,9 @@ namespace DuiLib
         else if (event.Type == UIEVENT_MOUSEMOVE)
         {
             if ((m_uButtonState & UISTATE_CAPTURED) != 0) {
-                LONG cx = event.ptMouse.x - ptLastMouse.x;
-				LONG cy = event.ptMouse.y - ptLastMouse.y;
-                ptLastMouse = event.ptMouse;
+                LONG cx = event.ptMouse.x - m_ptLastMouse.x;
+				LONG cy = event.ptMouse.y - m_ptLastMouse.y;
+                m_ptLastMouse = event.ptMouse;
                 RECT rc = m_rcNewPos;
 
                 if (eDragTop == m_eCurrDargDir || eDragLeftTop == m_eCurrDargDir || eDragRightTop == m_eCurrDargDir)

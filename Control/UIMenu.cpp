@@ -257,7 +257,7 @@ void CMenuWnd::Init(CMenuElementUI* pOwner, STRINGorID xml, LPCTSTR pSkinType, P
 
 	s_context_menu_observer.AddReceiver(this);
 
-	Create((m_pOwner == NULL) ? m_hParent : m_pOwner->GetManager()->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST, CDuiRect());
+    Create((m_pOwner == NULL) ? m_hParent : m_pOwner->GetManager()->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST, CDuiRect());
     // HACK: Don't deselect the parent's caption
     HWND hWndParent = m_hWnd;
     while( ::GetParent(hWndParent) != NULL ) hWndParent = ::GetParent(hWndParent);
@@ -316,12 +316,15 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			LPCTSTR pDefaultAttributes = m_pOwner->GetManager()->GetDefaultAttributeList(DUI_CTR_MENU);
 			if( pDefaultAttributes ) {
 				m_pLayout->ApplyAttributeList(pDefaultAttributes);
-			}
-			m_pLayout->SetBkColor(0xFFeeeeee);
-			m_pLayout->SetBorderColor(0xFF85E4FF);
-			m_pLayout->SetBorderSize(0);
+            }
+            else {
+                m_pLayout->SetBkColor(0xFFeeeeee);
+                m_pLayout->SetBorderColor(0xFF85E4FF);
+                m_pLayout->SetBorderSize(0);
+            }
+			
 			m_pLayout->SetAutoDestroy(false);
-			m_pLayout->EnableScrollBar();
+			//m_pLayout->EnableScrollBar();
 			for( int i = 0; i < m_pOwner->GetCount(); i++ ) {
 				if(m_pOwner->GetItemAt(i)->GetInterface(DUI_CTR_MENUELEMENT) != NULL ){
 					//(static_cast<CMenuElementUI*>(m_pOwner->GetItemAt(i)))->SetOwner(m_pLayout);
@@ -341,10 +344,8 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
                 m_pfunModifyMenu(m_pLayout, m_pModifyParam);
 			// Position the popup window in absolute space
 			RECT rcOwner = m_pOwner->GetPos();
-			RECT rc = rcOwner;
-
-			int cxFixed = 0;
-			int cyFixed = 0;
+			RECT rc = rcOwner;	
+            RECT rcInset = m_pLayout->GetInset();
 
 #if defined(WIN32) && !defined(UNDER_CE)
 			MONITORINFO oMonitor = {}; 
@@ -356,29 +357,18 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWork);
 #endif
 			SIZE szAvailable = { rcWork.right - rcWork.left, rcWork.bottom - rcWork.top };
-
-			for( int it = 0; it < m_pLayout->GetCount(); it++ ) {
-				if(m_pLayout->GetItemAt(it)->GetInterface(DUI_CTR_MENUELEMENT) != NULL ){
-					CControlUI* pControl = static_cast<CControlUI*>(m_pLayout->GetItemAt(it));
-					SIZE sz = pControl->EstimateSize(szAvailable);
-					cyFixed += sz.cy;
-
-					if( cxFixed < sz.cx )
-						cxFixed = sz.cx;
-				}
-			}
-			cyFixed += 4;
-			cxFixed += 4;
+            SIZE sz = m_pLayout->EstimateSize(szAvailable);
+            int cxFixed = sz.cx;
+            int cyFixed = sz.cy;			
 
 			RECT rcWindow;
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWindow);
 
-			rc.top = rcOwner.top;
+			rc.top = rcOwner.top - rcInset.top;
 			rc.bottom = rc.top + cyFixed;
 			::MapWindowRect(m_pOwner->GetManager()->GetPaintWindow(), HWND_DESKTOP, &rc);
 			rc.left = rcWindow.right;
 			rc.right = rc.left + cxFixed;
-			rc.right += 2;
 
 			bool bReachBottom = false;
 			bool bReachRight = false;
@@ -431,7 +421,7 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if( rc.top < rcWork.top )
 			{
-				rc.top = rcOwner.top;
+				rc.top = rcOwner.top - rcInset.top;
 				rc.bottom = rc.top + cyFixed;
 			}
 
