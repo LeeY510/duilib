@@ -2679,18 +2679,27 @@ void CListContainerElementUI::SetPos(RECT rc)
     if (m_pOwner == NULL) return;
     if (m_pHeader == NULL) return;
 
+    RECT rtHeader = { 0 };
+    RECT rt = { 0 };
     int nCount = m_items.GetSize();
     for (int i = 0; i < nCount; i++)
     {
-        CControlUI *pHorizontalLayout = static_cast<CControlUI*>(m_items[i]);
+        CControlUI *pItem = static_cast<CControlUI*>(m_items[i]);
         CListHeaderItemUI *pHeaderItem = static_cast<CListHeaderItemUI*>(m_pHeader->GetItemAt(i));
-        if (pHorizontalLayout != NULL && pHeaderItem != NULL)
+        if (pItem != NULL && pHeaderItem != NULL)
         {
-            RECT rtHeader = pHeaderItem->GetPos();
-            RECT rt = pHorizontalLayout->GetPos();
-            rt.left = rtHeader.left;
-            rt.right = rtHeader.right;
-            pHorizontalLayout->SetPos(rt);
+            if (pHeaderItem->IsVisible()) {
+                rtHeader = pHeaderItem->GetPos();
+                rt = pItem->GetPos();
+                rt.left = rtHeader.left;
+                rt.right = rtHeader.right;
+            }
+            else {
+                rt = pItem->GetPos();
+                rt.left = rtHeader.right;
+                rt.right = rtHeader.right;
+            }
+            pItem->SetPos(rt);
         }
     }
 }
