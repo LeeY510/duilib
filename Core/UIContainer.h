@@ -3,6 +3,8 @@
 
 #pragma once
 
+typedef void(*DragCb)(POINT ptMouse, DuiLib::CControlUI* pCtrl, RECT rcPos, void* pCbParam);
+
 namespace DuiLib {
 /////////////////////////////////////////////////////////////////////////////////////
 //
@@ -140,7 +142,7 @@ public:
     virtual UINT GetControlFlags() const;
     virtual void DoPostPaint(HDC hDC, const RECT& rcPaint);
     virtual RECT GetThumbRect(bool bUseNew) const;
-
+    void SetDragCb(DragCb pDragCb, void* pDragCbParam);
 protected:
     virtual void SetFloatPos(int iIndex);
     virtual void ProcessScrollBar(RECT rc, int cxRequired, int cyRequired);
@@ -170,6 +172,9 @@ protected:
 	RECT m_rcNewPos;
 	CStdPtrArray m_lstThumb;
     eDragDirection m_eCurrDargDir;
+
+    DragCb m_pDragCb;
+    void*  m_pDragCbParam;
 };
 
 } // namespace DuiLib

@@ -19,7 +19,9 @@ namespace DuiLib
         m_uButtonState(0),
         m_iSepSize(4),
         m_bImmMode(false),
-        m_iDragDir(eDragAll)
+        m_iDragDir(eDragAll),
+        m_pDragCb(NULL),
+        m_pDragCbParam(NULL)
     {
         m_ptLastMouse.x = m_ptLastMouse.y = 0;
         ::ZeroMemory(&m_rcInset, sizeof(m_rcInset));
@@ -1066,7 +1068,6 @@ namespace DuiLib
 
     RECT CContainerUI::GetThumbRect(bool bUseNew) const
     {
-
         RECT rc;
         if ((m_uButtonState & UISTATE_CAPTURED) != 0 && bUseNew)
             rc = m_rcNewPos;
@@ -1120,6 +1121,8 @@ namespace DuiLib
                 if (!m_bImmMode && m_pManager) m_pManager->RemovePostPaint(this);
                 NeedParentUpdate();
 				ClearThumbList();
+                if (NULL != m_pDragCb)
+                    m_pDragCb(event.ptMouse, this, m_rcItem, m_pDragCbParam);
                 return true;
             }
         }
@@ -1207,6 +1210,8 @@ namespace DuiLib
                 if (m_bImmMode) {
                     m_rcItem = m_rcNewPos;
                     NeedParentUpdate();
+                    if (NULL != m_pDragCb)
+                        m_pDragCb(event.ptMouse,this, m_rcItem, m_pDragCbParam);
                 }
                 else {
                     rcInvalidate.Join(GetThumbRect(true));
@@ -1353,6 +1358,12 @@ namespace DuiLib
                 m_lstThumb.Add(new ThumbInfo(eDragRight, m_rcItem.right - m_iSepSize, m_rcItem.top, m_rcItem.right, m_rcItem.bottom));
             }
         }
+    }
+
+    void CContainerUI::SetDragCb(DragCb pDragCb, void* pDragCbParam)
+    {
+        m_pDragCb = pDragCb;
+        m_pDragCbParam = pDragCbParam;
     }
 
 } // namespace DuiLib

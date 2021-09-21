@@ -463,8 +463,6 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			m_pm.SetInitSize(szAvailable.cx, szAvailable.cy);
 
-			DWORD dwAlignment = eMenuAlignment_Left | eMenuAlignment_Top;
-
 			SIZE szInit = m_pm.GetInitSize();
 			CDuiRect rc;
 			CPoint point = m_BasedPoint;
@@ -476,17 +474,23 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			int nWidth = rc.GetWidth();
 			int nHeight = rc.GetHeight();
 
-			if (dwAlignment & eMenuAlignment_Right)
+			if (rc.right > rcWork.right)
 			{
 				rc.right = point.x;
 				rc.left = rc.right - nWidth;
 			}
 
-			if (dwAlignment & eMenuAlignment_Bottom)
+			if (rc.bottom > rcWork.bottom)
 			{
 				rc.bottom = point.y;
 				rc.top = rc.bottom - nHeight;
 			}
+
+            if (rc.top < rcWork.top)
+            {
+                rc.top = rcWork.top;
+                rc.bottom = rc.top + nHeight;
+            }
 
 			SetForegroundWindow(m_hWnd);
 			MoveWindow(m_hWnd, rc.left, rc.top, rc.GetWidth(), rc.GetHeight(), FALSE);
