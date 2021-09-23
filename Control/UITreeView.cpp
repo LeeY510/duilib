@@ -813,6 +813,24 @@ namespace DuiLib
 		if(m_uItemMinWidth > 0)
 			pControl->SetMinWidth(m_uItemMinWidth);
 
+        CTreeNodeUI* pParent = pControl->GetParentNode();
+        if (pParent)
+        {
+            CCheckBoxUI* pFolderButton = pParent->GetFolderButton();
+            if (!pFolderButton->GetCheck())
+            {
+                pFolderButton = pControl->GetFolderButton();
+                pFolderButton->SetCheck(false);
+                pControl->SetVisibleTag(false);
+                pControl->SetVisible(false);
+            }
+            else
+            {
+                pControl->SetVisibleTag(true);
+                pControl->SetVisible(true);
+            }
+        }
+
 		CListUI::Add(pControl);
 
 		if(pControl->GetCountChild() > 0)
@@ -855,6 +873,24 @@ namespace DuiLib
 
 		pControl->SetVisibleFolderBtn(m_bVisibleFolderBtn);
 		pControl->SetVisibleCheckBtn(m_bVisibleCheckBtn);
+
+        CTreeNodeUI* pParent = pControl->GetParentNode();
+        if (pParent)
+        {
+            CCheckBoxUI* pFolderButton = pParent->GetFolderButton();
+            if (!pFolderButton->GetCheck())
+            {
+                pFolderButton = pControl->GetFolderButton();
+                pFolderButton->SetCheck(false);
+                pControl->SetVisibleTag(false);
+                pControl->SetVisible(false);
+            }
+            else
+            {
+                pControl->SetVisibleTag(true);
+                pControl->SetVisible(true);
+            }
+        }
 
 		if(m_uItemMinWidth > 0)
 			pControl->SetMinWidth(m_uItemMinWidth);
@@ -989,8 +1025,8 @@ namespace DuiLib
 		{
 			CCheckBoxUI* pFolder = (CCheckBoxUI*)pMsg->pSender;
 			CTreeNodeUI* pItem = (CTreeNodeUI*)pFolder->GetParent()->GetParent();
-			pItem->SetVisibleTag(!pFolder->GetCheck());
-			SetItemExpand(!pFolder->GetCheck(),pItem);
+			pItem->SetVisibleTag(pFolder->GetCheck());
+			SetItemExpand(pFolder->GetCheck(),pItem);
 			return true;
 		}
 		return true;
@@ -1010,8 +1046,8 @@ namespace DuiLib
 			CTreeNodeUI* pItem		= static_cast<CTreeNodeUI*>(pMsg->pSender);
 			CCheckBoxUI* pFolder	= pItem->GetFolderButton();
 			pFolder->Selected(!pFolder->IsSelected());
-			pItem->SetVisibleTag(!pFolder->GetCheck());
-			SetItemExpand(!pFolder->GetCheck(),pItem);
+			pItem->SetVisibleTag(pFolder->GetCheck());
+			SetItemExpand(pFolder->GetCheck(),pItem);
 			return true;
 		}
 		return false;
@@ -1078,7 +1114,7 @@ namespace DuiLib
 					CTreeNodeUI* pItem = _TreeNode->GetChildNode(nIndex);
 					pItem->SetVisible(_Expanded);
 
-					if(pItem->GetCountChild() && !pItem->GetFolderButton()->IsSelected())
+					if(pItem->GetCountChild() && pItem->GetFolderButton()->IsSelected())
 						SetItemExpand(_Expanded,pItem);
 				}
 			}
@@ -1093,7 +1129,7 @@ namespace DuiLib
 
 				pItem->SetVisible(_Expanded);
 
-				if(pItem->GetCountChild() && !pItem->GetFolderButton()->IsSelected())
+				if(pItem->GetCountChild() && pItem->GetFolderButton()->IsSelected())
 					SetItemExpand(_Expanded,pItem);
 
 				nIndex++;
