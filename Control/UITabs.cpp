@@ -989,36 +989,8 @@ namespace DuiLib
                 if (!m_pTabPaneCloseCb(pItem, m_pCbParam))
                     return true;
             }
-            bool bIsSelected = pItem->IsSelected();
-            this->Remove(pItem);
-
-            if (!m_strGroupName.IsEmpty()) {
-                CStdPtrArray* arrGroup = m_pManager->GetOptionGroup(m_strGroupName);
-                for (int i = 0; i < arrGroup->GetSize(); ++i) {
-                    CControlUI* pControl = (CControlUI*)(arrGroup->GetAt(i));
-                    if (pControl == pItem) {
-                        arrGroup->Remove(i);
-                        break;
-                    }
-                }
-            }
-
-            int nCount = m_itemOptStack.GetSize();
-            for (int nIndex = 0; nIndex < nCount; ++nIndex)
-            {
-                CControlUI* pCtrl = (CControlUI*)m_itemOptStack.GetAt(nIndex);
-                if (pCtrl == pItem) {
-                    m_itemOptStack.Remove(nIndex);
-                    --nCount;
-                    break;
-                }
-            }
-
-            if (bIsSelected && nCount > 0) {
-                --nCount;
-                CTabPaneUI* pTabPane = (CTabPaneUI*)m_itemOptStack.GetAt(nCount);
-                pTabPane->Selected(true);
-            }
+            
+            RemoveItem(pItem);
             return true;
         }
         return true;
@@ -1050,5 +1022,52 @@ namespace DuiLib
     void CTabsUI::SetTabPaneCloseCb(TabPaneCloseCb pTabPaneCloseCb, void* pCbParam){
         m_pTabPaneCloseCb = pTabPaneCloseCb;
         m_pCbParam = pCbParam;
+    }
+
+    void CTabsUI::RemoveTabPane(CControlUI* pTabPane) {
+        int iCount = this->GetCount();
+        int i = 0;
+        for (; i < iCount; ++i)
+        {
+            CControlUI* pItem = this->GetItemAt(i);
+            if (pItem == pTabPane)
+                break;
+        }
+
+        if (i >= iCount) return;
+        RemoveItem((CTabPaneUI*)pTabPane);
+    }
+
+    void CTabsUI::RemoveItem(CTabPaneUI* pTabPane) {
+        bool bIsSelected = pTabPane->IsSelected();
+        this->Remove(pTabPane);
+
+        if (!m_strGroupName.IsEmpty()) {
+            CStdPtrArray* arrGroup = m_pManager->GetOptionGroup(m_strGroupName);
+            for (int i = 0; i < arrGroup->GetSize(); ++i) {
+                CControlUI* pControl = (CControlUI*)(arrGroup->GetAt(i));
+                if (pControl == pTabPane) {
+                    arrGroup->Remove(i);
+                    break;
+                }
+            }
+        }
+
+        int nCount = m_itemOptStack.GetSize();
+        for (int nIndex = 0; nIndex < nCount; ++nIndex)
+        {
+            CControlUI* pCtrl = (CControlUI*)m_itemOptStack.GetAt(nIndex);
+            if (pCtrl == pTabPane) {
+                m_itemOptStack.Remove(nIndex);
+                --nCount;
+                break;
+            }
+        }
+
+        if (bIsSelected && nCount > 0) {
+            --nCount;
+            CTabPaneUI* pItem = (CTabPaneUI*)m_itemOptStack.GetAt(nCount);
+            pItem->Selected(true);
+        }
     }
 }

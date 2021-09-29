@@ -110,7 +110,7 @@ namespace DuiLib
             if (sz.cy < pControl->GetMinHeight()) sz.cy = pControl->GetMinHeight();
             if (sz.cy > pControl->GetMaxHeight()) sz.cy = pControl->GetMaxHeight();
 
-            RECT rcCtrl = { iPosX + rcPadding.left, iPosY + rcPadding.top, iPosX + rcPadding.left + sz.cx, iPosY + sz.cy + rcPadding.top + rcPadding.bottom };
+            RECT rcCtrl = { iPosX + rcPadding.left, iPosY + rcPadding.top, iPosX + rcPadding.left + sz.cx, iPosY + sz.cy + rcPadding.top };
             pControl->SetPos(rcCtrl);
 
             iPosX += sz.cx + m_iChildPadding + rcPadding.left + rcPadding.right;

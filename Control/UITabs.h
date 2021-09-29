@@ -154,8 +154,10 @@ namespace DuiLib
         void PushItemSelected(CControlUI* pItem);
 
         void SetTabPaneCloseCb(TabPaneCloseCb pTabPaneCloseCb, void* pCbParam);
+        void RemoveTabPane(CControlUI* pTabPane);
     private:
         void InitTabPane(CControlUI* pControl);
+        void RemoveItem(CTabPaneUI* pTabPane);
     private:
         UINT        m_uItemMinWidth;
         UINT        m_uItemMaxWidth;
