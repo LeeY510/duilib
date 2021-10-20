@@ -50,11 +50,15 @@ namespace DuiLib
 		virtual void PaintStatusImage(HDC hDC);
         void SetHotBorderColor(DWORD dwHotBorderColor);
         virtual DWORD GetBorderColor() const;
+
+        void SetPushedBkColor(DWORD dwColor);
+        DWORD GetPushedBkColor() const;
 	protected:
 		UINT m_uButtonState;
 
 		DWORD m_dwHotBkColor;
 		DWORD m_dwHotTextColor;
+        DWORD m_dwPushedBkColor;
 		DWORD m_dwPushedTextColor;
 		DWORD m_dwFocusedTextColor;
         DWORD m_dwHotBorderColor;

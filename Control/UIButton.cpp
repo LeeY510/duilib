@@ -10,6 +10,7 @@ namespace DuiLib
 		, m_dwFocusedTextColor(0)
 		, m_dwHotBkColor(0)
         , m_dwHotBorderColor(0)
+        , m_dwPushedBkColor(0)
 	{
 		m_uTextStyle = DT_SINGLELINE | DT_VCENTER | DT_CENTER;
 	}
@@ -366,6 +367,13 @@ namespace DuiLib
             DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
             SetHotBorderColor(clrColor);
         }
+        else if (_tcscmp(pstrName, _T("pushedbkcolor")) == 0)
+        {
+            if (*pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+            LPTSTR pstr = NULL;
+            DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+            SetPushedBkColor(clrColor);
+        }
         
 		else CLabelUI::SetAttribute(pstrName, pstrValue);
 	}
@@ -420,6 +428,10 @@ namespace DuiLib
 			}
 		}
 		else if( (m_uButtonState & UISTATE_PUSHED) != 0 ) {
+            if (m_dwPushedBkColor != 0) {
+                CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwPushedBkColor));
+            }
+            
 			if( !m_sPushedImage.IsEmpty() ) {
 				if( !DrawImage(hDC, (LPCTSTR)m_sPushedImage) ){
 					m_sPushedImage.Empty();
@@ -485,5 +497,15 @@ Label_ForeImage:
         }
 
         return CLabelUI::GetBorderColor();
+    }
+
+    void CButtonUI::SetPushedBkColor(DWORD dwColor)
+    {
+        m_dwPushedBkColor = dwColor;
+    }
+
+    DWORD CButtonUI::GetPushedBkColor() const
+    {
+        return m_dwPushedBkColor;
     }
 }

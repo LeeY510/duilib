@@ -118,9 +118,13 @@ SIZE CMenuUI::EstimateSize(SIZE szAvailable)
         cxFixed = m_cxyFixed.cx;
     }
 
-    if (cyFixed > (m_cxyFixed.cy - (m_rcInset.top + m_rcInset.bottom)))
+    if (m_cxyFixed.cy == 0)
     {
         cyFixed += m_rcInset.top + m_rcInset.bottom;
+    }
+    else
+    {
+        cyFixed = m_cxyFixed.cy;
     }
 
     return CSize(cxFixed, cyFixed);
