@@ -680,6 +680,10 @@ SIZE CMenuElementUI::EstimateSize(SIZE szAvailable)
 		cXY.cy = iHeight;
 	}
 
+    if (cXY.cx > this->GetMaxWidth()) {
+        cXY.cx = this->GetMaxWidth();
+    }
+
 	return cXY;
 }
 
