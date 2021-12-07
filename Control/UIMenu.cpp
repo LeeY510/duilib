@@ -254,8 +254,12 @@ void CMenuWnd::Init(CMenuElementUI* pOwner, STRINGorID xml, LPCTSTR pSkinType, P
 
 	if (pSkinType != NULL)
 		m_sType = pSkinType;
-    if (NULL != pOwner)
-        m_pTrigger = pOwner->GetMenuWnd()->GetTrigger();
+    if (NULL != pOwner) {
+        CMenuUI *pMenuUI = static_cast<CMenuUI *>(pOwner->GetParent()->GetParent());
+        ASSERT(pMenuUI);
+        CControlUI* pTrigger = pMenuUI->GetOwnWnd()->GetTrigger();
+        m_pTrigger = pTrigger;
+    }
 
 	m_xml = xml;
 

@@ -276,9 +276,10 @@ namespace DuiLib
             }
 
 			if( !m_sSelectedImage.IsEmpty() ) {
-				if( !DrawImage(hDC, (LPCTSTR)m_sSelectedImage) ) m_sSelectedImage.Empty();
-				else goto Label_ForeImage;
-			}			
+				if( !DrawImage(hDC, (LPCTSTR)m_sSelectedImage) ) m_sSelectedImage.Empty();				
+			}
+
+            goto Label_ForeImage;
 		}
 
 		CButtonUI::PaintStatusImage(hDC);
