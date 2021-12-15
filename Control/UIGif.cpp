@@ -180,7 +180,8 @@ namespace DuiLib
             SetFixedWidth(m_pGifImage->GetWidth());
             SetFixedHeight(m_pGifImage->GetHeight());
         }
-        if (m_bIsAutoPlay)
+
+        if (m_bIsAutoPlay && m_bVisible)
         {
             PlayGif();
         }
