@@ -2121,6 +2121,8 @@ void CRichEditUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     }
     else if (_tcscmp(pstrName, _T("tipvalue")) == 0) SetTipValue(pstrValue);
     else if (_tcscmp(pstrName, _T("tipvaluecolor")) == 0) SetTipValueColor(pstrValue);
+    else if (_tcscmp(pstrName, _T("maxchar")) == 0) SetLimitText(_ttoi(pstrValue));
+
     else CContainerUI::SetAttribute(pstrName, pstrValue);
 }
 

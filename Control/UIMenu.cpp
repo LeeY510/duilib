@@ -695,6 +695,8 @@ void CMenuElementUI::DoEvent(TEventUI& event)
 {
 	if( event.Type == UIEVENT_MOUSEENTER )
 	{
+        if (!IsEnabled()) return;
+
 		CListContainerElementUI::DoEvent(event);
 		if( m_pWindow ) return;
 		bool hasSubMenu = false;
