@@ -29,6 +29,7 @@ namespace DuiLib
 		bool	Add(CControlUI* _pTreeNodeUI);
 		bool	AddAt(CControlUI* pControl, int iIndex);
 		bool	Remove(CControlUI* pControl);
+        void    RemoveAll();
 
 		void	SetVisibleTag(bool _IsVisible);
 		bool	GetVisibleTag();

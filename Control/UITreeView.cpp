@@ -400,6 +400,24 @@ namespace DuiLib
 		return false;
 	}
 
+    void CTreeNodeUI::RemoveAll() {
+        int iCount = mTreeNodes.GetSize() - 1;
+        for (; iCount > -1; --iCount)
+        {
+            CTreeNodeUI* pNode = static_cast<CTreeNodeUI*>(mTreeNodes.GetAt(iCount));
+            if (pNode)
+            {
+                while (pNode->IsHasChild())
+                    pNode->RemoveAt(static_cast<CTreeNodeUI*>(pNode->mTreeNodes.GetAt(0)));
+
+                mTreeNodes.Remove(iCount);
+
+                if (pTreeView)
+                    pTreeView->Remove(pNode);
+            }
+        }
+    }
+
 	//************************************
 	// 函数名称: SetParentNode
 	// 返回类型: void
