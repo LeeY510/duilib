@@ -118,6 +118,7 @@ namespace DuiLib
 // 			}
 // 			return;
 // 		}
+
 		if( event.Type == UIEVENT_MOUSEENTER )
 		{
 			if( IsEnabled()) {
