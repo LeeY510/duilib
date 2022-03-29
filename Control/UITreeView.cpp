@@ -110,14 +110,14 @@ namespace DuiLib
 
 		CListContainerElementUI::DoEvent(event);
 
-		if( event.Type == UIEVENT_DBLCLICK )
-		{
-			if( IsEnabled() ) {
-				m_pManager->SendNotify(this, _T("itemdbclick"));
-				Invalidate();
-			}
-			return;
-		}
+// 		if( event.Type == UIEVENT_DBLCLICK )
+// 		{
+// 			if( IsEnabled() ) {
+// 				m_pManager->SendNotify(this, _T("itemdbclick"));
+// 				Invalidate();
+// 			}
+// 			return;
+// 		}
 		if( event.Type == UIEVENT_MOUSEENTER )
 		{
 			if( IsEnabled()) {

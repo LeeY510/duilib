@@ -30,7 +30,10 @@ namespace DuiLib
 		DWORD GetSelectedTextColor();
 
 		void SetSelectedBkColor(DWORD dwBkColor);
-		DWORD GetSelectBkColor();        
+		DWORD GetSelectBkColor();    
+
+        LPCTSTR GetSelectedDisableImage();
+        void SetSelectedDisableImage(LPCTSTR pStrImage);
 
 		LPCTSTR GetForeImage();
 		void SetForeImage(LPCTSTR pStrImage);
@@ -62,6 +65,7 @@ namespace DuiLib
 		CDuiString		m_sSelectedImage;
 		CDuiString		m_sSelectedHotImage;
 		CDuiString		m_sForeImage;
+        CDuiString		m_sSelectedDisableImage;
         int		        m_iSelectedFont;
 	};
 

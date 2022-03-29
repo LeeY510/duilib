@@ -252,6 +252,7 @@ namespace DuiLib
             DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
             SetSelectedBorderColor(clrColor);
         }
+        else if (_tcscmp(pstrName, _T("selecteddisableimage")) == 0) SetSelectedDisableImage(pstrValue);
 		else CButtonUI::SetAttribute(pstrName, pstrValue);
 	}
 
@@ -261,7 +262,13 @@ namespace DuiLib
         //优先绘制不可以图片
         if (!IsEnabled())
         {
-            CButtonUI::PaintStatusImage(hDC);
+            if (IsSelected() && !m_sSelectedDisableImage.IsEmpty()) {
+                DrawImage(hDC, (LPCTSTR)m_sSelectedDisableImage);
+            }
+            else {
+                CButtonUI::PaintStatusImage(hDC);
+            }
+            
             return;
         }
 
@@ -350,5 +357,16 @@ Label_ForeImage:
             return m_dwSelectedBorderColor;
         }
         return CButtonUI::GetBorderColor();
+    }
+
+    LPCTSTR COptionUI::GetSelectedDisableImage()
+    {
+        return m_sSelectedDisableImage;
+    }
+
+    void COptionUI::SetSelectedDisableImage(LPCTSTR pStrImage)
+    {
+        m_sSelectedDisableImage = pStrImage;
+        Invalidate();
     }
 }
