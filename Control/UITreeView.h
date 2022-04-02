@@ -105,15 +105,17 @@ namespace DuiLib
 		CTreeViewUI(void);
 		~CTreeViewUI(void);
 
+        friend class CTreeNodeUI;
+
 	public:
 		virtual LPCTSTR GetClass() const;
 		virtual LPVOID	GetInterface(LPCTSTR pstrName);
 		virtual bool Add(CTreeNodeUI* pControl );
-		virtual long AddAt(CTreeNodeUI* pControl, int iIndex );
-		virtual bool AddAt(CTreeNodeUI* pControl,CTreeNodeUI* _IndexNode);
+		virtual bool AddAt(CTreeNodeUI* pControl, int iIndex );
 		virtual bool Remove(CTreeNodeUI* pControl);
 		virtual bool RemoveAt(int iIndex);
 		virtual void RemoveAll();
+
 		virtual bool OnCheckBoxChanged(void* param);
 		virtual bool OnFolderChanged(void* param);
 		virtual bool OnDBClickItem(void* param);
@@ -132,10 +134,19 @@ namespace DuiLib
 		virtual void SetSelItemHotTextColor(DWORD _dwSelHotItemTextColor);
 		
 		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+        virtual void RemoveListItem(CControlUI* pControl);
+
+        virtual CControlUI* GetRootAt(int iIndex) const;
+        virtual int GetRootIndex(CControlUI* pControl) const;
+        virtual int GetRootCount() const;
+    private:
+        void LoopAdd(CTreeNodeUI* pControl);
+        int  LoopAddAt(CTreeNodeUI* pControl, int iIndex);
 	private:
 		UINT m_uItemMinWidth;
 		bool m_bVisibleFolderBtn;
 		bool m_bVisibleCheckBtn;
+        CStdPtrArray mRootNodes;
 	};
 }
 
