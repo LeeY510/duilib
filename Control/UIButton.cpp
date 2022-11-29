@@ -71,7 +71,6 @@ namespace DuiLib
 				else m_uButtonState &= ~UISTATE_PUSHED;
 				Invalidate();
 			}
-			return;
 		}
 		if( event.Type == UIEVENT_BUTTONUP )
 		{
@@ -80,7 +79,6 @@ namespace DuiLib
 				m_uButtonState &= ~(UISTATE_PUSHED | UISTATE_CAPTURED);
 				Invalidate();
 			}
-			return;
 		}
 		if( event.Type == UIEVENT_CONTEXTMENU )
 		{

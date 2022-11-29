@@ -2566,14 +2566,7 @@ void CListContainerElementUI::DoEvent(TEventUI& event)
             }            
         }
     }
-    if( event.Type == UIEVENT_BUTTONUP ) 
-    {
-        return;
-    }
-    if( event.Type == UIEVENT_MOUSEMOVE )
-    {
-        return;
-    }
+
     if( event.Type == UIEVENT_MOUSEENTER )
     {
         if( IsEnabled() ) {
