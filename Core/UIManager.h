@@ -219,6 +219,7 @@ public:
     static void ReloadSkin();
     static bool LoadPlugin(LPCTSTR pstrModuleName);
     static CStdPtrArray* GetPlugins();
+    static bool GetResourceData(HINSTANCE hInst, int iResId, LPCTSTR pstrType, LPCTSTR pstrFilename, BYTE** pData, size_t& iLen);
 
     bool UseParentResource(CPaintManagerUI* pm);
     CPaintManagerUI* GetParentResource() const;

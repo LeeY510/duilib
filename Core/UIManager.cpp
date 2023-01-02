@@ -1,12 +1,45 @@
 #include "StdAfx.h"
 #include <zmouse.h>
 
+//////////////////////////////////////////////////////////////////////////
 DECLARE_HANDLE(HZIP);	// An HZIP identifies a zip file that has been opened
 typedef DWORD ZRESULT;
+typedef struct
+{
+    int index;                 // index of this file within the zip
+    char name[MAX_PATH];       // filename within the zip
+    DWORD attr;                // attributes, as in GetFileAttributes.
+    FILETIME atime, ctime, mtime;// access, create, modify filetimes
+    long comp_size;            // sizes of item, compressed and uncompressed. These
+    long unc_size;             // may be -1 if not yet known (e.g. being streamed in)
+} ZIPENTRY;
+typedef struct
+{
+    int index;                 // index of this file within the zip
+    TCHAR name[MAX_PATH];      // filename within the zip
+    DWORD attr;                // attributes, as in GetFileAttributes.
+    FILETIME atime, ctime, mtime;// access, create, modify filetimes
+    long comp_size;            // sizes of item, compressed and uncompressed. These
+    long unc_size;             // may be -1 if not yet known (e.g. being streamed in)
+} ZIPENTRYW;
 #define OpenZip OpenZipU
 #define CloseZip(hz) CloseZipU(hz)
-extern HZIP OpenZipU(void *z,unsigned int len,DWORD flags);
+extern HZIP OpenZipU(void *z, unsigned int len, DWORD flags);
 extern ZRESULT CloseZipU(HZIP hz);
+#ifdef _UNICODE
+#define ZIPENTRY ZIPENTRYW
+#define GetZipItem GetZipItemW
+#define FindZipItem FindZipItemW
+#else
+#define GetZipItem GetZipItemA
+#define FindZipItem FindZipItemA
+#endif
+extern ZRESULT GetZipItemA(HZIP hz, int index, ZIPENTRY *ze);
+extern ZRESULT GetZipItemW(HZIP hz, int index, ZIPENTRYW *ze);
+extern ZRESULT FindZipItemA(HZIP hz, const TCHAR *name, bool ic, int *index, ZIPENTRY *ze);
+extern ZRESULT FindZipItemW(HZIP hz, const TCHAR *name, bool ic, int *index, ZIPENTRYW *ze);
+extern ZRESULT UnzipItem(HZIP hz, int index, void *dst, unsigned int len, DWORD flags);
+//////////////////////////////////////////////////////////////////////////
 
 namespace DuiLib {
 
@@ -2481,6 +2514,72 @@ void CPaintManagerUI::UsedVirtualWnd(bool bUsed)
 CShadowUI* CPaintManagerUI::GetShadow()
 {
     return &m_shadow;
+}
+
+bool CPaintManagerUI::GetResourceData(HINSTANCE hInst, int iResId, LPCTSTR pstrType, LPCTSTR pstrFilename, BYTE** pData, size_t& iLen)
+{
+    LPCTSTR pstrResId = MAKEINTRESOURCE(iResId);
+
+    HRSRC hResource = ::FindResource(hInst, pstrResId, pstrType);
+    if (NULL == hResource) {
+        return false;
+    }
+
+    HGLOBAL hGlobal = ::LoadResource(hInst, hResource);
+    if (NULL == hGlobal) {
+        ::FreeResource(hResource);
+        return false;
+    }
+
+    DWORD dwSize = ::SizeofResource(hInst, hResource);
+    if (0 == dwSize) {
+        ::FreeResource(hResource);
+        return false;
+    }
+
+    BYTE* lpResourceZIPBuffer = new BYTE[dwSize];
+    if (NULL == lpResourceZIPBuffer) {
+        ::FreeResource(hResource);
+        return false;
+    }
+
+    ::CopyMemory(lpResourceZIPBuffer, (LPBYTE)::LockResource(hGlobal), dwSize);
+    ::FreeResource(hResource);
+
+    HZIP hz = (HZIP)OpenZip(lpResourceZIPBuffer, dwSize, 3);
+    if (NULL == hz) {
+        delete[] lpResourceZIPBuffer;
+        return false;
+    }
+
+    ZIPENTRY ze;
+    int i = 0;
+    if (FindZipItem(hz, pstrFilename, true, &i, &ze) != 0) {
+        delete[] lpResourceZIPBuffer;
+        CloseZip(hz);
+        return false;
+    }
+
+    dwSize = ze.unc_size;
+    if (0 == dwSize || dwSize > 4096 * 1024) {
+        delete[] lpResourceZIPBuffer;
+        CloseZip(hz);
+        return false;
+    }
+
+    BYTE* pByte = new BYTE[dwSize];
+    int res = UnzipItem(hz, i, pByte, dwSize, 3);
+    delete[] lpResourceZIPBuffer;
+    CloseZip(hz);
+
+    if (res != 0x00000000 && res != 0x00000600) {
+        delete[] pByte;
+        return false;
+    }
+
+    *pData = pByte;
+    iLen = dwSize;
+    return true;
 }
 
 } // namespace DuiLib
