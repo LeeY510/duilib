@@ -2582,4 +2582,43 @@ bool CPaintManagerUI::GetResourceData(HINSTANCE hInst, int iResId, LPCTSTR pstrT
     return true;
 }
 
+bool CPaintManagerUI::IsZipResourceFileExist(LPCTSTR pstrFilename)
+{
+    if (m_pStrResourceZip.IsEmpty()) {
+        CDuiString sFile = m_pStrResourcePath;
+        sFile += pstrFilename;
+        int iRet = 0;
+#ifdef UNICODE
+        iRet = _waccess(sFile.GetData(), 0);
+#else 
+        iRet = _access(sFile.GetData(), 0);
+#endif
+        return (0 == iRet);
+    }
+    else
+    {
+        if (m_bCachedResourceZip)
+        {
+            HZIP hz = (HZIP)m_hResourceZip;
+            if (hz == NULL) return false;
+            ZIPENTRY ze;
+            int i;
+            if (FindZipItem(hz, pstrFilename, true, &i, &ze) != 0) return false;
+            return true;
+        }
+        else {
+            CDuiString sFile = m_pStrResourcePath;
+            sFile += m_pStrResourceZip;
+            HZIP hz = OpenZip((void*)sFile.GetData(), 0, 2);
+            if (hz == NULL) return false;
+            ZIPENTRY ze;
+            int i;
+            ZRESULT result = FindZipItem(hz, pstrFilename, true, &i, &ze);
+            CloseZip(hz);
+            return (result == 0);
+        }        
+    }
+    return false;
+}
+
 } // namespace DuiLib
