@@ -29,133 +29,8 @@ EXTERN_C const IID IID_ITextHost = { /* c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
 #define HIMETRIC_PER_INCH 2540
 #endif
 
-#include <textserv.h>
 
-class CTxtWinHost : public ITextHost
-{
-public:
-    CTxtWinHost();
-    BOOL Init(CRichEditUI *re , const CREATESTRUCT *pcs);
-    virtual ~CTxtWinHost();
 
-    ITextServices* GetTextServices(void) { return pserv; }
-    void SetClientRect(RECT *prc);
-    RECT* GetClientRect() { return &rcClient; }
-    BOOL GetWordWrap(void) { return fWordWrap; }
-    void SetWordWrap(BOOL fWordWrap);
-    BOOL GetReadOnly();
-    void SetReadOnly(BOOL fReadOnly);
-    void SetFont(HFONT hFont);
-    void SetColor(DWORD dwColor);
-    SIZEL* GetExtent();
-    void SetExtent(SIZEL *psizelExtent);
-    void LimitText(LONG nChars);
-    BOOL IsCaptured();
-
-    BOOL GetAllowBeep();
-    void SetAllowBeep(BOOL fAllowBeep);
-    WORD GetDefaultAlign();
-    void SetDefaultAlign(WORD wNewAlign);
-    BOOL GetRichTextFlag();
-    void SetRichTextFlag(BOOL fNew);
-    LONG GetDefaultLeftIndent();
-    void SetDefaultLeftIndent(LONG lNewIndent);
-    BOOL SetSaveSelection(BOOL fSaveSelection);
-    HRESULT OnTxInPlaceDeactivate();
-    HRESULT OnTxInPlaceActivate(LPCRECT prcClient);
-    BOOL GetActiveState(void) { return fInplaceActive; }
-    BOOL DoSetCursor(RECT *prc, POINT *pt);
-    void SetTransparent(BOOL fTransparent);
-    void GetControlRect(LPRECT prc);
-    LONG SetAccelPos(LONG laccelpos);
-    WCHAR SetPasswordChar(WCHAR chPasswordChar);
-    void SetDisabled(BOOL fOn);
-    LONG SetSelBarWidth(LONG lSelBarWidth);
-    BOOL GetTimerState();
-
-    void SetCharFormat(CHARFORMAT2W &c);
-    void SetParaFormat(PARAFORMAT2 &p);
-
-    // -----------------------------
-    //	IUnknown interface
-    // -----------------------------
-    virtual HRESULT _stdcall QueryInterface(REFIID riid, void **ppvObject);
-    virtual ULONG _stdcall AddRef(void);
-    virtual ULONG _stdcall Release(void);
-
-    // -----------------------------
-    //	ITextHost interface
-    // -----------------------------
-    virtual HDC TxGetDC();
-    virtual INT TxReleaseDC(HDC hdc);
-    virtual BOOL TxShowScrollBar(INT fnBar, BOOL fShow);
-    virtual BOOL TxEnableScrollBar (INT fuSBFlags, INT fuArrowflags);
-    virtual BOOL TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw);
-    virtual BOOL TxSetScrollPos (INT fnBar, INT nPos, BOOL fRedraw);
-    virtual void TxInvalidateRect(LPCRECT prc, BOOL fMode);
-    virtual void TxViewChange(BOOL fUpdate);
-    virtual BOOL TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight);
-    virtual BOOL TxShowCaret(BOOL fShow);
-    virtual BOOL TxSetCaretPos(INT x, INT y);
-    virtual BOOL TxSetTimer(UINT idTimer, UINT uTimeout);
-    virtual void TxKillTimer(UINT idTimer);
-    virtual void TxScrollWindowEx (INT dx, INT dy, LPCRECT lprcScroll, LPCRECT lprcClip, HRGN hrgnUpdate, LPRECT lprcUpdate, UINT fuScroll);
-    virtual void TxSetCapture(BOOL fCapture);
-    virtual void TxSetFocus();
-    virtual void TxSetCursor(HCURSOR hcur, BOOL fText);
-    virtual BOOL TxScreenToClient (LPPOINT lppt);
-    virtual BOOL TxClientToScreen (LPPOINT lppt);
-    virtual HRESULT TxActivate( LONG * plOldState );
-    virtual HRESULT TxDeactivate( LONG lNewState );
-    virtual HRESULT TxGetClientRect(LPRECT prc);
-    virtual HRESULT TxGetViewInset(LPRECT prc);
-    virtual HRESULT TxGetCharFormat(const CHARFORMATW **ppCF );
-    virtual HRESULT TxGetParaFormat(const PARAFORMAT **ppPF);
-    virtual COLORREF TxGetSysColor(int nIndex);
-    virtual HRESULT TxGetBackStyle(TXTBACKSTYLE *pstyle);
-    virtual HRESULT TxGetMaxLength(DWORD *plength);
-    virtual HRESULT TxGetScrollBars(DWORD *pdwScrollBar);
-    virtual HRESULT TxGetPasswordChar(TCHAR *pch);
-    virtual HRESULT TxGetAcceleratorPos(LONG *pcp);
-    virtual HRESULT TxGetExtent(LPSIZEL lpExtent);
-    virtual HRESULT OnTxCharFormatChange (const CHARFORMATW * pcf);
-    virtual HRESULT OnTxParaFormatChange (const PARAFORMAT * ppf);
-    virtual HRESULT TxGetPropertyBits(DWORD dwMask, DWORD *pdwBits);
-    virtual HRESULT TxNotify(DWORD iNotify, void *pv);
-    virtual HIMC TxImmGetContext(void);
-    virtual void TxImmReleaseContext(HIMC himc);
-    virtual HRESULT TxGetSelectionBarWidth (LONG *lSelBarWidth);
-
-private:
-    CRichEditUI *m_re;
-    ULONG	cRefs;					// Reference Count
-    ITextServices	*pserv;		    // pointer to Text Services object
-    // Properties
-
-    DWORD		dwStyle;				// style bits
-
-    unsigned	fEnableAutoWordSel	:1;	// enable Word style auto word selection?
-    unsigned	fWordWrap			:1;	// Whether control should word wrap
-    unsigned	fAllowBeep			:1;	// Whether beep is allowed
-    unsigned	fRich				:1;	// Whether control is rich text
-    unsigned	fSaveSelection		:1;	// Whether to save the selection when inactive
-    unsigned	fInplaceActive		:1; // Whether control is inplace active
-    unsigned	fTransparent		:1; // Whether control is transparent
-    unsigned	fTimer				:1;	// A timer is set
-    unsigned    fCaptured           :1;
-
-    LONG		lSelBarWidth;			// Width of the selection bar
-    LONG  		cchTextMost;			// maximum text size
-    DWORD		dwEventMask;			// DoEvent mask to pass on to parent window
-    LONG		icf;
-    LONG		ipf;
-    RECT		rcClient;				// Client Rect for this control
-    SIZEL		sizelExtent;			// Extent array
-    CHARFORMAT2W cf;					// Default character format
-    PARAFORMAT2	pf;					    // Default paragraph format
-    LONG		laccelpos;				// Accelerator position
-    WCHAR		chPasswordChar;		    // Password character
-};
 
 // Convert Pixels on the X axis to Himetric
 LONG DXtoHimetricX(LONG dx, LONG xPerInch)
@@ -215,40 +90,22 @@ HRESULT InitDefaultParaFormat(CRichEditUI* re, PARAFORMAT2* ppf)
     return S_OK;
 }
 
-HRESULT CreateHost(CRichEditUI *re, const CREATESTRUCT *pcs, CTxtWinHost **pptec)
-{
-    HRESULT hr = E_FAIL;
-    //GdiSetBatchLimit(1);
-
-    CTxtWinHost *phost = new CTxtWinHost();
-    if(phost)
-    {
-        if (phost->Init(re, pcs))
-        {
-            *pptec = phost;
-            hr = S_OK;
-        }
-    }
-
-    if (FAILED(hr))
-    {
-        delete phost;
-    }
-
-    return TRUE;
-}
-
 CTxtWinHost::CTxtWinHost() : m_re(NULL)
 {
     ::ZeroMemory(&cRefs, sizeof(CTxtWinHost) - offsetof(CTxtWinHost, cRefs));
     cchTextMost = cInitTextMax;
     laccelpos = -1;
+
+    pcf = new CHARFORMAT2W();
+    ppf = new PARAFORMAT2();
 }
 
 CTxtWinHost::~CTxtWinHost()
 {
     pserv->OnTxInPlaceDeactivate();
     pserv->Release();
+    delete pcf;
+    delete ppf;
 }
 
 ////////////////////// Create/Init/Destruct Commands ///////////////////////
@@ -262,10 +119,12 @@ BOOL CTxtWinHost::Init(CRichEditUI *re, const CREATESTRUCT *pcs)
     // Initialize Reference count
     cRefs = 1;
 
+    CHARFORMAT2W& cf = *((CHARFORMAT2W*)pcf);
     // Create and cache CHARFORMAT for this control
     if(FAILED(InitDefaultCharFormat(re, &cf, NULL)))
         goto err;
 
+    PARAFORMAT2& pf = *((PARAFORMAT2*)ppf);
     // Create and cache PARAFORMAT for this control
     if(FAILED(InitDefaultParaFormat(re, &pf)))
         goto err;
@@ -586,13 +445,13 @@ HRESULT CTxtWinHost::TxGetViewInset(LPRECT prc)
 
 HRESULT CTxtWinHost::TxGetCharFormat(const CHARFORMATW **ppCF)
 {
-    *ppCF = &cf;
+    *ppCF = (CHARFORMATW*)pcf;
     return NOERROR;
 }
 
 HRESULT CTxtWinHost::TxGetParaFormat(const PARAFORMAT **ppPF)
 {
-    *ppPF = &pf;
+    *ppPF = (PARAFORMAT*)ppf;
     return NOERROR;
 }
 
@@ -759,6 +618,7 @@ void CTxtWinHost::SetFont(HFONT hFont)
     LOGFONT lf;
     ::GetObject(hFont, sizeof(LOGFONT), &lf);
     LONG yPixPerInch = ::GetDeviceCaps(m_re->GetManager()->GetPaintDC(), LOGPIXELSY);
+    CHARFORMAT2W& cf = *((CHARFORMAT2W*)pcf);
     cf.yHeight = -lf.lfHeight * LY_PER_INCH / yPixPerInch;
     if(lf.lfWeight >= FW_BOLD)
         cf.dwEffects |= CFE_BOLD;
@@ -781,6 +641,7 @@ void CTxtWinHost::SetFont(HFONT hFont)
 
 void CTxtWinHost::SetColor(DWORD dwColor)
 {
+    CHARFORMAT2W& cf = *((CHARFORMAT2W*)pcf);
     cf.crTextColor = RGB(GetBValue(dwColor), GetGValue(dwColor), GetRValue(dwColor));
     pserv->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, 
         TXTBIT_CHARFORMATCHANGE);
@@ -824,11 +685,13 @@ void CTxtWinHost::SetAllowBeep(BOOL fAllowBeep)
 
 WORD CTxtWinHost::GetDefaultAlign()
 {
+    PARAFORMAT2& pf = *((PARAFORMAT2*)ppf);
     return pf.wAlignment;
 }
 
 void CTxtWinHost::SetDefaultAlign(WORD wNewAlign)
 {
+    PARAFORMAT2& pf = *((PARAFORMAT2*)ppf);
     pf.wAlignment = wNewAlign;
 
     // Notify control of property change
@@ -850,11 +713,13 @@ void CTxtWinHost::SetRichTextFlag(BOOL fNew)
 
 LONG CTxtWinHost::GetDefaultLeftIndent()
 {
+    PARAFORMAT2& pf = *((PARAFORMAT2*)ppf);
     return pf.dxOffset;
 }
 
 void CTxtWinHost::SetDefaultLeftIndent(LONG lNewIndent)
 {
+    PARAFORMAT2& pf = *((PARAFORMAT2*)ppf);
     pf.dxOffset = lNewIndent;
 
     pserv->OnTxPropertyBitsChange(TXTBIT_PARAFORMATCHANGE, 0);
@@ -971,6 +836,7 @@ WCHAR CTxtWinHost::SetPasswordChar(WCHAR ch_PasswordChar)
 
 void CTxtWinHost::SetDisabled(BOOL fOn)
 {
+    CHARFORMAT2W& cf = *((CHARFORMAT2W*)pcf);
     cf.dwMask	 |= CFM_COLOR | CFM_DISABLED;
     cf.dwEffects |= CFE_AUTOCOLOR | CFE_DISABLED;
 
@@ -1010,12 +876,12 @@ BOOL CTxtWinHost::GetTimerState()
 
 void CTxtWinHost::SetCharFormat(CHARFORMAT2W &c)
 {
-    cf = c;
+    *(CHARFORMAT2W*)pcf = c;
 }
 
 void CTxtWinHost::SetParaFormat(PARAFORMAT2 &p)
 {
-    pf = p;
+    *(PARAFORMAT2*)ppf = p;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1638,7 +1504,7 @@ void CRichEditUI::DoInit()
     cs.cy = 0;
     cs.cx = 0;
     cs.lpszName = m_sText.GetData();
-    CreateHost(this, &cs, &m_pTwh);
+    CreateHost(&cs);
     if( m_pTwh ) {
         m_pTwh->SetTransparent(TRUE);
         LRESULT lResult;
@@ -2246,7 +2112,17 @@ void CRichEditUI::PaintText(HDC hDC)
     CRenderEngine::DrawText(hDC, m_pManager, m_rcItem, m_sTipValue, m_dwTipValueColor, m_iFont, DT_TOP);
 }
 
+void CRichEditUI::CreateHost(const CREATESTRUCT *pcs) {
 
+    CTxtWinHost *phost = new CTxtWinHost();
+    if (phost->Init(this, pcs))
+    {
+        m_pTwh = phost;
+    }
+    else {
+        delete phost;
+    }
+}
 
 
 } // namespace DuiLib
