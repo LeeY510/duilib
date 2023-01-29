@@ -245,12 +245,12 @@ public:
 
     SIZE EstimateSize(SIZE szAvailable);
     virtual void SetPos(RECT rc);
-    void DoEvent(TEventUI& event);
+    virtual void DoEvent(TEventUI& event);
     virtual void DoPaint(HDC hDC, const RECT& rcPaint);
 
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-    LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
+    virtual LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
 
     void PaintText(HDC hDC);
 
