@@ -158,12 +158,20 @@ namespace DuiLib
 
     void CGifUI::InitGifImage()
     {
-        const TImageInfo* pImageInfo = m_pManager->AddGdiplusImage(GetBkImage());
-        if (NULL == pImageInfo)
+        LPCTSTR pStrImage = GetBkImage();
+        const TImageInfo* data = m_pManager->GetGdiplusImageEx(pStrImage);
+        if (NULL == data)
+        {
+            m_pManager->AddGdiplusImage(pStrImage, NULL, false);
+            data = m_pManager->GetGdiplusImage(pStrImage);
+        }
+
+        if (NULL == data || data->pGdiplusImage->GetLastStatus() != Gdiplus::Ok)
         {
             return;
         }
-        m_pGifImage = pImageInfo->pGdiplusImage;
+
+        m_pGifImage = data->pGdiplusImage;
         UINT nCount = 0;
         nCount = m_pGifImage->GetFrameDimensionsCount();
         GUID* pDimensionIDs = new GUID[nCount];

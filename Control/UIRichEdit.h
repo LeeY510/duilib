@@ -168,7 +168,7 @@ public:
     void SetLimitText(int iChars);
     long GetTextLength(DWORD dwFlags = GTL_DEFAULT) const;
     CDuiString GetText() const;
-    void SetText(LPCTSTR pstrText);
+    virtual void SetText(LPCTSTR pstrText);
     bool GetModify() const;
     void SetModify(bool bModified = true) const;
     void GetSel(CHARRANGE &cr) const;

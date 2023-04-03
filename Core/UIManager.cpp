@@ -1999,6 +1999,7 @@ const TImageInfo* CPaintManagerUI::AddImage(LPCTSTR bitmap, LPCTSTR type, DWORD 
     if( !m_mImageHash.Insert(bitmap, data) ) {
         ::DeleteObject(data->hBitmap);
         delete data;
+        data = NULL;
     }
 
     return data;
@@ -2068,6 +2069,7 @@ const TImageInfo* CPaintManagerUI::AddGdiplusImage(LPCTSTR bitmap, LPCTSTR type 
     {
         delete data->pGdiplusImage;
         delete data;
+        data = NULL;
     }
 
     return data;
