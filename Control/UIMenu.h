@@ -36,7 +36,8 @@ enum MenuAlignment
 typedef class ObserverImpl<BOOL, ContextMenuParam> ContextMenuObserver;
 typedef class ReceiverImpl<BOOL, ContextMenuParam> ContextMenuReceiver;
 typedef void (*PMODIFYMENUFUNC)(CMenuUI *, void*);
-typedef void(*PMENUCLICK)(CControlUI*, void*);
+typedef void (*PMENUCLICK)(CControlUI*, void*);
+typedef void (*PMENUWINEVENTFUNC)(CControlUI*, UINT , WPARAM , LPARAM);
 extern ContextMenuObserver s_context_menu_observer;
 
 class UILIB_API CMenuUI : public CListUI
@@ -88,6 +89,9 @@ public:
 	{
 		return m_pTrigger;
 	}
+
+    void SetMenuWinEventFunc(PMENUWINEVENTFUNC pMeunWinEventFunc);
+    PMENUWINEVENTFUNC GetMenuWinEventFunc();
 protected:
 	void Init(CMenuElementUI* pOwner, STRINGorID xml, LPCTSTR pSkinType, POINT point);
     LPCTSTR GetWindowClassName() const;
@@ -108,6 +112,7 @@ protected:
     void* m_pModifyParam;
 	PMENUCLICK	m_pMenuClick;
     void* m_pMenuClickParam;
+    PMENUWINEVENTFUNC m_pMeunWinEventFunc;
 };
 
 class UILIB_API CMenuElementUI : public CListContainerElementUI

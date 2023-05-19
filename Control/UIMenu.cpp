@@ -29,6 +29,7 @@ LPVOID CMenuUI::GetInterface(LPCTSTR pstrName)
 
 void CMenuUI::DoEvent(TEventUI& event)
 {
+
 	return __super::DoEvent(event);
 }
 
@@ -127,6 +128,14 @@ SIZE CMenuUI::EstimateSize(SIZE szAvailable)
         cyFixed = m_cxyFixed.cy;
     }
 
+    if (cxFixed > szAvailable.cx) {
+        cxFixed = szAvailable.cx;
+    }
+
+    if (cyFixed > szAvailable.cy) {
+        cyFixed = szAvailable.cy;
+    }
+
     return CSize(cxFixed, cyFixed);
 }
 
@@ -172,7 +181,8 @@ m_pfunModifyMenu(NULL),
 m_pModifyParam(NULL),
 m_pMenuClick(NULL),
 m_pMenuClickParam(NULL),
-m_pTrigger(NULL)
+m_pTrigger(NULL),
+m_pMeunWinEventFunc(NULL)
 {}
 
 BOOL CMenuWnd::Receive(ContextMenuParam param)
@@ -296,6 +306,9 @@ void CMenuWnd::OnFinalMessage(HWND hWnd)
 		m_pOwner->m_uButtonState &= ~ UISTATE_PUSHED;
 		m_pOwner->Invalidate();
 	}
+    else {
+        if (m_pTrigger) m_pTrigger->GetManager()->SendNotify(m_pTrigger, DUI_MSGTYPE_MENUCLOSE, 0, 0, false);
+    }
     delete this;
 }
 
@@ -359,7 +372,7 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			MONITORINFO oMonitor = {}; 
 			oMonitor.cbSize = sizeof(oMonitor);
 			::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-			CDuiRect rcWork = oMonitor.rcWork;
+			CDuiRect rcWork = oMonitor.rcMonitor;
 #else
 			CDuiRect rcWork;
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWork);
@@ -367,7 +380,7 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			SIZE szAvailable = { rcWork.right - rcWork.left, rcWork.bottom - rcWork.top };
             SIZE sz = m_pLayout->EstimateSize(szAvailable);
             int cxFixed = sz.cx;
-            int cyFixed = sz.cy;			
+            int cyFixed = sz.cy;
 
 			RECT rcWindow;
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWindow);
@@ -461,14 +474,13 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			MONITORINFO oMonitor = {}; 
 			oMonitor.cbSize = sizeof(oMonitor);
 			::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-			CDuiRect rcWork = oMonitor.rcWork;
+			CDuiRect rcWork = oMonitor.rcMonitor;
 #else
 			CDuiRect rcWork;
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWork);
 #endif
 			SIZE szAvailable = { rcWork.right - rcWork.left, rcWork.bottom - rcWork.top };
 			szAvailable = pRoot->EstimateSize(szAvailable);
-
 			m_pm.SetInitSize(szAvailable.cx, szAvailable.cy);
 
 			SIZE szInit = m_pm.GetInitSize();
@@ -524,7 +536,6 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	else if( uMsg == WM_KILLFOCUS )
 	{
 		HWND hFocusWnd = (HWND)wParam;
-
 		BOOL bInMenuWindowList = FALSE;
 		ContextMenuParam param;
 		param.hWnd = GetHWND();
@@ -542,10 +553,9 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		if( !bInMenuWindowList ) {
 			param.wParam = 1;
-            if(m_pTrigger)
-                m_pTrigger->GetManager()->SendNotify(m_pTrigger, DUI_MSGTYPE_MENUCLOSE, 0, 0, true);
+//             if(m_pTrigger)
+//                 m_pTrigger->GetManager()->SendNotify(m_pTrigger, DUI_MSGTYPE_MENUCLOSE, 0, 0, true);
 			s_context_menu_observer.RBroadcast(param);
-
 			return 0;
 		}
 	}
@@ -557,9 +567,23 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 
+    if (NULL != m_pMeunWinEventFunc && NULL != m_pTrigger) {
+        m_pMeunWinEventFunc(m_pTrigger, uMsg, wParam, lParam);
+    }
+
     LRESULT lRes = 0;
     if( m_pm.MessageHandler(uMsg, wParam, lParam, lRes) ) return lRes;
     return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
+}
+
+void CMenuWnd::SetMenuWinEventFunc(PMENUWINEVENTFUNC pMeunWinEventFunc)
+{
+    m_pMeunWinEventFunc = pMeunWinEventFunc;
+}
+
+PMENUWINEVENTFUNC CMenuWnd::GetMenuWinEventFunc()
+{
+    return m_pMeunWinEventFunc;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -726,7 +750,7 @@ void CMenuElementUI::DoEvent(TEventUI& event)
 		return;
 	}
 
-	if( event.Type == UIEVENT_BUTTONDOWN )
+	if( event.Type == UIEVENT_BUTTONDOWN || (event.Type == UIEVENT_KEYDOWN && event.chKey == '\r'))
 	{
 		if( IsEnabled() ){
 			CListContainerElementUI::DoEvent(event);
@@ -753,17 +777,22 @@ void CMenuElementUI::DoEvent(TEventUI& event)
 				param.wParam = 1;
 				s_context_menu_observer.RBroadcast(param);
 
+                CControlUI* pSender = event.pSender;
+                if (NULL == pSender) {
+                    pSender = this;
+                }
+
 				CMenuUI *pMenuUI = static_cast<CMenuUI *>(GetParent()->GetParent());
 				ASSERT(pMenuUI);
 				CControlUI* pTrigger = pMenuUI->GetOwnWnd()->GetTrigger();
 				if (NULL != pTrigger)
 				{
-					pTrigger->GetManager()->SendNotify(pTrigger, DUI_MSGTYPE_MENUITEMCLICK, (WPARAM)event.pSender, 0, true);
+					pTrigger->GetManager()->SendNotify(pTrigger, DUI_MSGTYPE_MENUITEMCLICK, (WPARAM)pSender, 0, true);
 				}
 				else
 				{
 					PMENUCLICK menuclick = pMenuUI->GetOwnWnd()->GetMenuClickFunc();
-                    if (menuclick)menuclick(event.pSender, pMenuUI->GetOwnWnd()->GetMenuClickParam());
+                    if (menuclick)menuclick(pSender, pMenuUI->GetOwnWnd()->GetMenuClickParam());
 				}
 			}
         }
