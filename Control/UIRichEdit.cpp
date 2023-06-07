@@ -92,6 +92,7 @@ HRESULT InitDefaultParaFormat(CRichEditUI* re, PARAFORMAT2* ppf)
 
 CTxtWinHost::CTxtWinHost() : m_re(NULL)
 {
+    pserv = NULL;
     ::ZeroMemory(&cRefs, sizeof(CTxtWinHost) - offsetof(CTxtWinHost, cRefs));
     cchTextMost = cInitTextMax;
     laccelpos = -1;
@@ -1508,7 +1509,10 @@ void CRichEditUI::DoInit()
     if( m_pTwh ) {
         m_pTwh->SetTransparent(TRUE);
         LRESULT lResult;
-        m_pTwh->GetTextServices()->TxSendMessage(EM_SETLANGOPTIONS, 0, 0, &lResult);
+        ITextServices* pserv = m_pTwh->GetTextServices();
+        if (NULL != pserv) {
+            pserv->TxSendMessage(EM_SETLANGOPTIONS, 0, 0, &lResult);
+        }        
         m_pTwh->OnTxInPlaceActivate(NULL);
         m_pManager->AddMessageFilter(this);
     }
@@ -1525,7 +1529,15 @@ HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESU
                 return S_OK;
             }
         }
-        return m_pTwh->GetTextServices()->TxSendMessage(msg, wparam, lparam, plresult);
+
+        ITextServices* pserv = m_pTwh->GetTextServices();
+        if (NULL != pserv) {
+            return pserv->TxSendMessage(msg, wparam, lparam, plresult);
+        }
+        else {
+            int a = 0;
+            int b = a;
+        }        
     }
     return S_FALSE;
 }
@@ -1533,7 +1545,13 @@ HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESU
 IDropTarget* CRichEditUI::GetTxDropTarget()
 {
     IDropTarget *pdt = NULL;
-    if( m_pTwh->GetTextServices()->TxGetDropTarget(&pdt) == NOERROR ) return pdt;
+    if (NULL != m_pTwh) {
+        ITextServices* pserv = m_pTwh->GetTextServices();
+        if (NULL != pserv) {
+            if (pserv->TxGetDropTarget(&pdt) == NOERROR) return pdt;
+        }
+    }
+    
     return NULL;
 }
 
@@ -1700,7 +1718,7 @@ void CRichEditUI::DoEvent(TEventUI& event)
     if( event.Type == UIEVENT_SETFOCUS ) {
         if( m_pTwh ) {
             m_pTwh->OnTxInPlaceActivate(NULL);
-            m_pTwh->GetTextServices()->TxSendMessage(WM_SETFOCUS, 0, 0, 0);
+            TxSendMessage(WM_SETFOCUS, 0, 0, 0);
         }
 		m_bFocused = true;
 		Invalidate();
@@ -1709,7 +1727,7 @@ void CRichEditUI::DoEvent(TEventUI& event)
     if( event.Type == UIEVENT_KILLFOCUS )  {
         if( m_pTwh ) {
             m_pTwh->OnTxInPlaceActivate(NULL);
-            m_pTwh->GetTextServices()->TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
+            TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
         }
 		m_bFocused = false;
 		Invalidate();
@@ -1717,7 +1735,10 @@ void CRichEditUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_TIMER ) {
         if( m_pTwh ) {
-            m_pTwh->GetTextServices()->TxSendMessage(WM_TIMER, event.wParam, event.lParam, 0);
+            ITextServices* pserv = m_pTwh->GetTextServices();
+            if (NULL != pserv) {
+                pserv->TxSendMessage(WM_TIMER, event.wParam, event.lParam, 0);
+            }
         } 
     }
     if( event.Type == UIEVENT_SCROLLWHEEL ) {
@@ -1782,15 +1803,19 @@ void CRichEditUI::SetPos(RECT rc)
             LONG lWidth = rc.right - rc.left + m_pVerticalScrollBar->GetFixedWidth();
             LONG lHeight = 0;
             SIZEL szExtent = { -1, -1 };
-            m_pTwh->GetTextServices()->TxGetNaturalSize(
-                DVASPECT_CONTENT, 
-                GetManager()->GetPaintDC(), 
-                NULL,
-                NULL,
-                TXTNS_FITTOCONTENT,
-                &szExtent,
-                &lWidth,
-                &lHeight);
+            ITextServices* pserv = m_pTwh->GetTextServices();
+            if (NULL != pserv) {
+                pserv->TxGetNaturalSize(
+                    DVASPECT_CONTENT,
+                    GetManager()->GetPaintDC(),
+                    NULL,
+                    NULL,
+                    TXTNS_FITTOCONTENT,
+                    &szExtent,
+                    &lWidth,
+                    &lHeight);
+            }
+            
             if( lHeight > rc.bottom - rc.top ) {
                 m_pVerticalScrollBar->SetVisible(true);
                 m_pVerticalScrollBar->SetScrollPos(0);
@@ -1837,39 +1862,43 @@ void CRichEditUI::DoPaint(HDC hDC, const RECT& rcPaint)
 
     PaintText(hDC);
 
-    if( m_pTwh ) {
+    if (m_pTwh) {
         RECT rc;
         m_pTwh->GetControlRect(&rc);
         // Remember wparam is actually the hdc and lparam is the update
         // rect because this message has been preprocessed by the window.
-        m_pTwh->GetTextServices()->TxDraw(
-            DVASPECT_CONTENT,  		// Draw Aspect
-            /*-1*/0,				// Lindex
-            NULL,					// Info for drawing optimazation
-            NULL,					// target device information
-            hDC,			        // Draw device HDC
-            NULL, 				   	// Target device HDC
-            (RECTL*)&rc,			// Bounding client rectangle
-            NULL, 		            // Clipping rectangle for metafiles
-            (RECT*)&rcPaint,		// Update rectangle
-            NULL, 	   				// Call back function
-            NULL,					// Call back parameter
-            0);				        // What view of the object
-        if( m_bVScrollBarFixing ) {
-            LONG lWidth = rc.right - rc.left + m_pVerticalScrollBar->GetFixedWidth();
-            LONG lHeight = 0;
-            SIZEL szExtent = { -1, -1 };
-            m_pTwh->GetTextServices()->TxGetNaturalSize(
-                DVASPECT_CONTENT, 
-                GetManager()->GetPaintDC(), 
-                NULL,
-                NULL,
-                TXTNS_FITTOCONTENT,
-                &szExtent,
-                &lWidth,
-                &lHeight);
-            if( lHeight <= rc.bottom - rc.top ) {
-                NeedUpdate();
+        ITextServices* pserv = m_pTwh->GetTextServices();
+        if (NULL != pserv) {
+            pserv->TxDraw(
+                DVASPECT_CONTENT,  		// Draw Aspect
+                /*-1*/0,				// Lindex
+                NULL,					// Info for drawing optimazation
+                NULL,					// target device information
+                hDC,			        // Draw device HDC
+                NULL, 				   	// Target device HDC
+                (RECTL*)&rc,			// Bounding client rectangle
+                NULL, 		            // Clipping rectangle for metafiles
+                (RECT*)&rcPaint,		// Update rectangle
+                NULL, 	   				// Call back function
+                NULL,					// Call back parameter
+                0);				        // What view of the object
+
+            if (m_bVScrollBarFixing) {
+                LONG lWidth = rc.right - rc.left + m_pVerticalScrollBar->GetFixedWidth();
+                LONG lHeight = 0;
+                SIZEL szExtent = { -1, -1 };
+                pserv->TxGetNaturalSize(
+                    DVASPECT_CONTENT,
+                    GetManager()->GetPaintDC(),
+                    NULL,
+                    NULL,
+                    TXTNS_FITTOCONTENT,
+                    &szExtent,
+                    &lWidth,
+                    &lHeight);
+                if (lHeight <= rc.bottom - rc.top) {
+                    NeedUpdate();
+                }
             }
         }
     }
