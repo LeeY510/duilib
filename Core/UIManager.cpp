@@ -1243,6 +1243,17 @@ void CPaintManagerUI::RemoveOptionGroup(LPCTSTR pStrGroupName, CControlUI* pCont
 	}
 }
 
+void CPaintManagerUI::RemoveOptionGroup(LPCTSTR pStrGroupName) {
+    LPVOID lp = m_mOptionGroup.Find(pStrGroupName);
+    if (lp) {
+        CStdPtrArray* aOptionGroup = static_cast<CStdPtrArray*>(lp);
+        if (aOptionGroup == NULL) return;
+
+        delete aOptionGroup;
+        m_mOptionGroup.Remove(pStrGroupName);
+    }
+}
+
 void CPaintManagerUI::RemoveAllOptionGroups()
 {
 	CStdPtrArray* aOptionGroup;

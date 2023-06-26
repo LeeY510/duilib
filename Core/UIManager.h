@@ -282,6 +282,7 @@ public:
     bool AddOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl);
     CStdPtrArray* GetOptionGroup(LPCTSTR pStrGroupName);
     void RemoveOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl);
+    void RemoveOptionGroup(LPCTSTR pStrGroupName);
     void RemoveAllOptionGroups();
 
     CControlUI* GetFocus() const;

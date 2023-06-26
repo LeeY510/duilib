@@ -155,6 +155,7 @@ namespace DuiLib
 
         void SetTabPaneCloseCb(TabPaneCloseCb pTabPaneCloseCb, void* pCbParam);
         void RemoveTabPane(CControlUI* pTabPane);
+        void RemoveAll();
     private:
         void InitTabPane(CControlUI* pControl);
         void RemoveItem(CTabPaneUI* pTabPane);

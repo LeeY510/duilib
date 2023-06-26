@@ -1043,14 +1043,7 @@ namespace DuiLib
         this->Remove(pTabPane);
 
         if (!m_strGroupName.IsEmpty()) {
-            CStdPtrArray* arrGroup = m_pManager->GetOptionGroup(m_strGroupName);
-            for (int i = 0; i < arrGroup->GetSize(); ++i) {
-                CControlUI* pControl = (CControlUI*)(arrGroup->GetAt(i));
-                if (pControl == pTabPane) {
-                    arrGroup->Remove(i);
-                    break;
-                }
-            }
+            m_pManager->RemoveOptionGroup(m_strGroupName, pTabPane);
         }
 
         int nCount = m_itemOptStack.GetSize();
@@ -1069,5 +1062,10 @@ namespace DuiLib
             CTabPaneUI* pItem = (CTabPaneUI*)m_itemOptStack.GetAt(nCount);
             pItem->Selected(true);
         }
+    }
+
+    void CTabsUI::RemoveAll() {
+        __super::RemoveAll();
+        m_pManager->RemoveOptionGroup(m_strGroupName);
     }
 }
