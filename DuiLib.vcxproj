@@ -139,7 +139,7 @@
     <GenerateManifest>false</GenerateManifest>
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
     <IntDir>.\Build\Release\</IntDir>
-    <TargetName>$(ProjectName)_u</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\$(Platform)\</OutDir>
@@ -241,9 +241,10 @@
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>.\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <BaseAddress>0x11000000</BaseAddress>
-      <ImportLibrary>$(ProjectDir)lib/DuiLib_u.lib</ImportLibrary>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <BaseAddress>
+      </BaseAddress>
+      <ImportLibrary>$(ProjectDir)lib/DuiLib.lib</ImportLibrary>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -319,10 +320,11 @@
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>.\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
-      <BaseAddress>0x11000000</BaseAddress>
+      <BaseAddress>
+      </BaseAddress>
       <ImportLibrary>$(ProjectDir)lib/DuiLib_ud.lib</ImportLibrary>
     </Link>
     <Bscmake>
