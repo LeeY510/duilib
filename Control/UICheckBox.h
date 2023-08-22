@@ -32,6 +32,7 @@ namespace DuiLib
         void SetPartialSelectedDisableImage(LPCTSTR pStrImage);
 
         virtual void PaintStatusImage(HDC hDC);
+        virtual void Selected(bool bSelected);
     protected:
         bool			m_bPartialSelected;
     

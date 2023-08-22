@@ -15,7 +15,6 @@ namespace DuiLib
 
 	void CCheckBoxUI::SetCheck(bool bCheck)
 	{
-        m_bPartialSelected = false;
 		Selected(bCheck);
 	}
 
@@ -25,10 +24,10 @@ namespace DuiLib
 	}
 
     void  CCheckBoxUI::SetPartialSelected(bool bPartialSelected) {
-        m_bPartialSelected = bPartialSelected;
-        if (bPartialSelected) {
-            SetCheck(false);
-        }      
+        if (m_bPartialSelected != bPartialSelected) {
+            m_bPartialSelected = bPartialSelected;
+            Invalidate();
+        }         
     }
 
     void  CCheckBoxUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
@@ -93,5 +92,10 @@ namespace DuiLib
         }
 
         COptionUI::PaintStatusImage(hDC);
+    }
+
+    void CCheckBoxUI::Selected(bool bSelected) {
+        m_bPartialSelected = false;
+        COptionUI::Selected(bSelected);
     }
 }

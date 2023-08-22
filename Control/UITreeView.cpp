@@ -1038,7 +1038,7 @@ namespace DuiLib
 				for(int nIndex = 0;nIndex < nCount;nIndex++)
 				{
 					CTreeNodeUI* pItem = _TreeNode->GetChildNode(nIndex);
-					pItem->GetCheckBox()->Selected(_Selected);
+					pItem->GetCheckBox()->SetCheck(_Selected);
 					if(pItem->GetCountChild())
 						SetItemCheckBox(_Selected,pItem);
 				}
@@ -1052,7 +1052,7 @@ namespace DuiLib
 			while(nIndex < nCount)
 			{
 				CTreeNodeUI* pItem = (CTreeNodeUI*)GetItemAt(nIndex);
-				pItem->GetCheckBox()->Selected(_Selected);
+				pItem->GetCheckBox()->SetCheck(_Selected);
 				if(pItem->GetCountChild())
 					SetItemCheckBox(_Selected,pItem);
 
