@@ -46,7 +46,7 @@ namespace DuiLib
 		SIZE EstimateSize(SIZE szAvailable);
 		void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-		void PaintStatusImage(HDC hDC);
+        virtual void PaintStatusImage(HDC hDC);
 		void PaintText(HDC hDC);
         void DoEvent(TEventUI& event);
         void SetSelectedFont(int index);

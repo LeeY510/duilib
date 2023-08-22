@@ -317,7 +317,7 @@ namespace DuiLib
 	//************************************
 	void CTreeNodeUI::CheckBoxSelected( bool _Selected )
 	{
-		pCheckBox->Selected(_Selected);
+		pCheckBox->SetCheck(_Selected);
 	}
 
 	//************************************
@@ -327,7 +327,7 @@ namespace DuiLib
 	//************************************
 	bool CTreeNodeUI::IsCheckBoxSelected() const
 	{
-		return pCheckBox->IsSelected();
+		return pCheckBox->GetCheck();
 	}
 
 	//************************************
