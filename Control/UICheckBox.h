@@ -19,6 +19,7 @@ namespace DuiLib
 		bool GetCheck() const;
 
         void SetPartialSelected(bool bPartialSelected);
+        bool IsPartialSelected();
 
         void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 

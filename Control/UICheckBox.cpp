@@ -30,6 +30,10 @@ namespace DuiLib
         }         
     }
 
+    bool CCheckBoxUI::IsPartialSelected() {
+        return m_bPartialSelected;
+    }
+
     void  CCheckBoxUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
         if (_tcscmp(pstrName, _T("partialselected")) == 0) SetPartialSelected(_tcscmp(pstrValue, _T("true")) == 0);
 
