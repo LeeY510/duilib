@@ -431,20 +431,23 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				rc.top = rc.bottom - cyFixed;
 			}
 
+            if (rc.top < rcWork.top)
+            {
+                if (cyFixed >= rcWork.GetHeight()) {
+                    rc.top = rcWork.top;
+                    rc.bottom = rcWork.bottom;
+                }
+                else {
+                    rc.top = rcWork.top + (rcWork.GetHeight() - cyFixed) / 2;
+                    rc.bottom = rc.top + cyFixed;
+                }
+            }
+
 			if (rc.right > rcWork.right)
 			{
 				rc.right = rcWindow.left;
 				rc.left = rc.right - cxFixed;
-
-				rc.top = rcWindow.bottom;
-				rc.bottom = rc.top + cyFixed;
-			}
-
-			if( rc.top < rcWork.top )
-			{
-				rc.top = rcOwner.top - rcInset.top;
-				rc.bottom = rc.top + cyFixed;
-			}
+			}			
 
 			if (rc.left < rcWork.left)
 			{
@@ -508,8 +511,14 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
             if (rc.top < rcWork.top)
             {
-                rc.top = rcWork.top;
-                rc.bottom = rc.top + nHeight;
+                if (nHeight >= rcWork.GetHeight()) {
+                    rc.top = rcWork.top;
+                    rc.bottom = rcWork.bottom;
+                }
+                else {
+                    rc.top = rcWork.top + (rcWork.GetHeight() - nHeight) / 2;
+                    rc.bottom = rc.top + nHeight;
+                }
             }
 
 			SetForegroundWindow(m_hWnd);
