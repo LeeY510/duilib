@@ -877,6 +877,7 @@ namespace DuiLib
         }        
         
 		CListUI::AddAt(pControl, iListIndex);
+        mRootNodes.InsertAt(iIndex, pControl);
 
 		if(pControl->GetCountChild() > 0)
 		{
@@ -889,6 +890,7 @@ namespace DuiLib
 			}
 		}
 
+        pControl->SetTreeView(this);
 		return true;
 	}
     	
@@ -1393,6 +1395,8 @@ namespace DuiLib
                 }                
             }
         }
+
+        pControl->SetTreeView(this);
 
         return iIndex + 1;
     }
