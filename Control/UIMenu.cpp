@@ -759,7 +759,7 @@ void CMenuElementUI::DoEvent(TEventUI& event)
 		return;
 	}
 
-	if( event.Type == UIEVENT_BUTTONDOWN || (event.Type == UIEVENT_KEYDOWN && event.chKey == '\r'))
+	if( event.Type == UIEVENT_BUTTONDOWN || (event.Type == UIEVENT_KEYDOWN && (event.chKey == VK_RETURN || event.chKey == VK_TAB)))
 	{
 		if( IsEnabled() ){
 			CListContainerElementUI::DoEvent(event);
