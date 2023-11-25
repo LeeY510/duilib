@@ -418,7 +418,7 @@ bool CListUI::SelectItem(int iIndex, bool bTakeFocus)
     if (pListItem == NULL) return false;
 
     int iOldSel = m_iCurSel;
-    BOOL bCtrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000);
+    BOOL bCtrl = (::GetKeyState(VK_CONTROL) & 0x8000);
     // We should first unselect the currently selected item
     if (!bCtrl || !m_bMultiSelect)
     {
@@ -1858,7 +1858,7 @@ bool CListElementUI::Select(bool bSelect)
     if( bSelect == m_bSelected ) return true;
     m_bSelected = bSelect;
 
-    BOOL bShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000);
+    BOOL bShift = (::GetKeyState(VK_SHIFT) & 0x8000);
     if (m_pOwner != NULL && bSelect)
     {
         CListUI* list = (CListUI*)m_pOwner;
@@ -2486,7 +2486,7 @@ bool CListContainerElementUI::Select(bool bSelect)
     if (bSelect == m_bSelected) return true;
     m_bSelected = bSelect;
 
-    BOOL bShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000);
+    BOOL bShift = (::GetKeyState(VK_SHIFT) & 0x8000);
     if (m_pOwner != NULL && bSelect)
     {
         CListUI* list = (CListUI*)m_pOwner;
