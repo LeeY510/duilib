@@ -99,6 +99,11 @@ namespace DuiLib
     }
 
     void CCheckBoxUI::Selected(bool bSelected) {
+        if (bSelected == m_bSelected && m_bPartialSelected) {
+            m_bPartialSelected = false;
+            Invalidate();
+            return;
+        }
         m_bPartialSelected = false;
         COptionUI::Selected(bSelected);
     }
