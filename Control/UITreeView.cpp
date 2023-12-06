@@ -1034,14 +1034,46 @@ namespace DuiLib
     {
         if (!_TreeNode) return false;
 
+        OptionSelectedState state = _CheckBox->GetSelectedState();
+        if (eOptStatePartialSelected != state) {
+
             int nCount = _TreeNode->GetCountChild();
             for (int nIndex = 0; nIndex < nCount; nIndex++)
             {
                 CTreeNodeUI* pItem = _TreeNode->GetChildNode(nIndex);
-//                 pItem->GetCheckBox()->SetCheck(_Selected);
-//                 if (pItem->GetCountChild())
-//                     SetItemCheckBox(_Selected, pItem);
+                pItem->GetCheckBox()->Selected(eOptStateSelected == state);
             }
+        }
+
+        CTreeNodeUI* pParentNode = _TreeNode->GetParentNode();
+        if (NULL != pParentNode) {
+            OptionSelectedState parentState;
+            int nCount = pParentNode->GetCountChild();
+            for (int nIndex = 0; nIndex < nCount; nIndex++)
+            {
+                CTreeNodeUI* pItem = pParentNode->GetChildNode(nIndex);
+                OptionSelectedState childState = pItem->GetCheckBox()->GetSelectedState();
+                if (0 == nIndex) {
+                    parentState = childState;
+                    continue;
+                }
+
+                if (parentState != childState)
+                {
+                    parentState = eOptStatePartialSelected;
+                    break;
+                }
+            }
+
+            if (parentState != pParentNode->GetCheckBox()->GetSelectedState()) {
+                if (eOptStatePartialSelected == parentState) {
+                    pParentNode->GetCheckBox()->SetPartialSelected();
+                }
+                else {
+                    pParentNode->GetCheckBox()->Selected(eOptStateSelected == parentState);
+                }
+            }
+        }
 
         return true;
     }
