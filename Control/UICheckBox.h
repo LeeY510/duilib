@@ -17,29 +17,6 @@ namespace DuiLib
 
 		void SetCheck(bool bCheck);
 		bool GetCheck() const;
-
-        void SetPartialSelected(bool bPartialSelected);
-        bool IsPartialSelected();
-
-        void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-
-        LPCTSTR GetPartialSelectedImage();
-        void SetPartialSelectedImage(LPCTSTR pStrImage);
-
-        LPCTSTR GetPartialSelectedHotImage();
-        void SetPartialSelectedHotImage(LPCTSTR pStrImage);
-
-        LPCTSTR GetPartialSelectedDisableImage();
-        void SetPartialSelectedDisableImage(LPCTSTR pStrImage);
-
-        virtual void PaintStatusImage(HDC hDC);
-        virtual void Selected(bool bSelected);
-    protected:
-        bool			m_bPartialSelected;
-    
-        CDuiString		m_sPartialSelectedImage;
-        CDuiString		m_sPartialSelectedHotImage;
-        CDuiString		m_sPartialSelectedDisableImage;
 	};
 }
 

@@ -5,6 +5,13 @@
 
 namespace DuiLib
 {
+    enum OptionSelectedState
+    {
+        eOptStateNotSelected = 0,
+        eOptStateSelected = 1,
+        eOptStatePartialSelected = 2,
+    };
+
 	class UILIB_API COptionUI : public CButtonUI
 	{
 	public:
@@ -54,8 +61,22 @@ namespace DuiLib
 
         void SetSelectedBorderColor(DWORD dwSelectedBorderColor);
         virtual DWORD GetBorderColor() const;
+
+        void  SetPartialSelected();
+        bool IsPartialSelected();
+
+        LPCTSTR GetPartialSelectedImage();
+        void SetPartialSelectedImage(LPCTSTR pStrImage);
+
+        LPCTSTR GetPartialSelectedHotImage();
+        void SetPartialSelectedHotImage(LPCTSTR pStrImage);
+
+        LPCTSTR GetPartialSelectedDisableImage();
+        void SetPartialSelectedDisableImage(LPCTSTR pStrImage);
+
+        OptionSelectedState GetSelectedState();
 	protected:
-		bool			m_bSelected;
+        OptionSelectedState	m_iSelected; // 0 未选中 1选中 2选中部分
 		CDuiString		m_sGroupName;
 
 		DWORD			m_dwSelectedBkColor;
@@ -67,6 +88,10 @@ namespace DuiLib
 		CDuiString		m_sForeImage;
         CDuiString		m_sSelectedDisableImage;
         int		        m_iSelectedFont;
+
+        CDuiString		m_sPartialSelectedImage;
+        CDuiString		m_sPartialSelectedHotImage;
+        CDuiString		m_sPartialSelectedDisableImage;
 	};
 
 } // namespace DuiLib
