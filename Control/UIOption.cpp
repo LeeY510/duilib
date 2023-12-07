@@ -294,13 +294,26 @@ namespace DuiLib
                     if (!DrawImage(hDC, (LPCTSTR)m_sSelectedHotImage))
                         m_sSelectedHotImage.Empty();
                     else goto Label_ForeImage;
-                }                
+                }
+                else if (!m_sSelectedImage.IsEmpty()){
+                    if (!DrawImage(hDC, (LPCTSTR)m_sSelectedImage))
+                        m_sSelectedImage.Empty();
+                    else goto Label_ForeImage;
+                }
             }
-            else if (eOptStatePartialSelected == m_iSelected && !m_sPartialSelectedHotImage.IsEmpty())
+            else if (eOptStatePartialSelected == m_iSelected)
             {
-                if (!DrawImage(hDC, (LPCTSTR)m_sPartialSelectedHotImage))
-                    m_sPartialSelectedHotImage.Empty();
-                else goto Label_ForeImage;
+                if (!m_sPartialSelectedHotImage.IsEmpty()) {
+                    if (!DrawImage(hDC, (LPCTSTR)m_sPartialSelectedHotImage))
+                        m_sPartialSelectedHotImage.Empty();
+                    else goto Label_ForeImage;
+                }
+                else if (!m_sPartialSelectedImage.IsEmpty())
+                {
+                    if (!DrawImage(hDC, (LPCTSTR)m_sPartialSelectedImage))
+                        m_sPartialSelectedImage.Empty();
+                    else goto Label_ForeImage;
+                }                
             }
         }
         else
