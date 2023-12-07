@@ -284,10 +284,17 @@ namespace DuiLib
         }
 
         if ((m_uButtonState & UISTATE_HOT) != 0) {
-            if (eOptStateSelected == m_iSelected && !m_sSelectedHotImage.IsEmpty()) {
-                if (!DrawImage(hDC, (LPCTSTR)m_sSelectedHotImage))
-                    m_sSelectedHotImage.Empty();
-                else goto Label_ForeImage;
+            if (eOptStateSelected == m_iSelected) {
+
+                if (m_dwSelectedBkColor != 0) {
+                    CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwSelectedBkColor));
+                }
+
+                if (!m_sSelectedHotImage.IsEmpty()) {
+                    if (!DrawImage(hDC, (LPCTSTR)m_sSelectedHotImage))
+                        m_sSelectedHotImage.Empty();
+                    else goto Label_ForeImage;
+                }                
             }
             else if (eOptStatePartialSelected == m_iSelected && !m_sPartialSelectedHotImage.IsEmpty())
             {
@@ -298,14 +305,16 @@ namespace DuiLib
         }
         else
         {
-            if (eOptStateSelected == m_iSelected && !m_sSelectedImage.IsEmpty()) {
+            if (eOptStateSelected == m_iSelected) {
                 if (m_dwSelectedBkColor != 0) {
                     CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwSelectedBkColor));
                 }
 
-                if (!DrawImage(hDC, (LPCTSTR)m_sSelectedImage))
-                    m_sSelectedImage.Empty();
-                else goto Label_ForeImage;
+                if (!m_sSelectedImage.IsEmpty()) {
+                    if (!DrawImage(hDC, (LPCTSTR)m_sSelectedImage))
+                        m_sSelectedImage.Empty();
+                    else goto Label_ForeImage;
+                }                
             }
             else if (eOptStatePartialSelected == m_iSelected && !m_sPartialSelectedImage.IsEmpty())
             {
