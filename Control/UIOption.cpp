@@ -284,6 +284,10 @@ namespace DuiLib
         }
 
         if ((m_uButtonState & UISTATE_HOT) != 0) {
+            if (m_dwHotBkColor != 0) {
+                CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwHotBkColor));
+            }
+
             if (eOptStateSelected == m_iSelected) {
 
                 if (m_dwSelectedBkColor != 0) {
