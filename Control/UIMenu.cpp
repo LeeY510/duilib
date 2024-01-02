@@ -600,8 +600,6 @@ m_pWindow(NULL)
 {
 	m_cxyFixed.cy = 25;
 	m_bMouseChildEnabled = true;
-
-	SetMouseChildEnabled(false);
 }
 
 CMenuElementUI::~CMenuElementUI()
@@ -785,10 +783,7 @@ void CMenuElementUI::DoEvent(TEventUI& event)
 				param.wParam = 1;
 				s_context_menu_observer.RBroadcast(param);
 
-                CControlUI* pSender = event.pSender;
-                if (NULL == pSender) {
-                    pSender = this;
-                }
+                CControlUI* pSender = this;
 
 				CMenuUI *pMenuUI = static_cast<CMenuUI *>(GetParent()->GetParent());
 				ASSERT(pMenuUI);
