@@ -1067,5 +1067,6 @@ namespace DuiLib
     void CTabsUI::RemoveAll() {
         __super::RemoveAll();
         m_pManager->RemoveOptionGroup(m_strGroupName);
+        m_itemOptStack.Empty();
     }
 }
