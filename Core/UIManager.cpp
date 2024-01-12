@@ -101,6 +101,7 @@ CStdPtrArray CPaintManagerUI::m_aPlugins;
 CStdStringPtrMap CPaintManagerUI::m_mShareImageHash;
 CStdStringPtrMap CPaintManagerUI::m_mGdiplusShareImageHash;
 
+LPGETTXTBYTAG CPaintManagerUI::m_pGetTextByTagFunc = NULL;
 
 CPaintManagerUI::CPaintManagerUI() :
 m_hWndPaint(NULL),
@@ -2640,6 +2641,18 @@ bool CPaintManagerUI::IsZipResourceFileExist(LPCTSTR pstrFilename)
         }        
     }
     return false;
+}
+
+CDuiString CPaintManagerUI::GetTextByTag(LPCTSTR pstrTextTag) {
+    CDuiString sText;
+    if (NULL != m_pGetTextByTagFunc) {
+        sText = m_pGetTextByTagFunc(pstrTextTag);
+    }
+    return sText;
+}
+
+void CPaintManagerUI::SetGetTextByTagFunc(LPGETTXTBYTAG pFunc) {
+    m_pGetTextByTagFunc = pFunc;
 }
 
 } // namespace DuiLib

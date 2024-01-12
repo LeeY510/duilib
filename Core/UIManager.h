@@ -164,6 +164,8 @@ public:
 //
 typedef CControlUI* (*LPCREATECONTROL)(LPCTSTR pstrType);
 
+typedef CDuiString (*LPGETTXTBYTAG)(LPCTSTR pstrTextTag);
+
 
 class UILIB_API CPaintManagerUI
 {
@@ -341,6 +343,9 @@ public:
 	void UsedVirtualWnd(bool bUsed);
 
     CShadowUI* GetShadow();
+
+    static CDuiString GetTextByTag(LPCTSTR pstrTextTag);
+    static void SetGetTextByTagFunc(LPGETTXTBYTAG pFunc);
 private:
     static CControlUI* CALLBACK __FindControlFromNameHash(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromCount(CControlUI* pThis, LPVOID pData);
@@ -428,6 +433,7 @@ private:
     static short m_L;
     static CStdPtrArray m_aPreMessages;
     static CStdPtrArray m_aPlugins;
+    static LPGETTXTBYTAG m_pGetTextByTagFunc;
 
     CShadowUI m_shadow;
 public:

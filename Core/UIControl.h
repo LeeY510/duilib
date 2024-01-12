@@ -177,6 +177,10 @@ public:
     {
         return false;
     }
+private:
+    // 文本标记
+    virtual void SetTextTag(LPCTSTR pstrTextTag);
+    virtual void SetToolTipTag(LPCTSTR pstrToolTipTag);
 public:
     CEventSource OnInit;
     CEventSource OnDestroy;

@@ -961,6 +961,8 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("shortcut")) == 0 ) SetShortcut(pstrValue[0]);
     else if( _tcscmp(pstrName, _T("menu")) == 0 ) SetContextMenuUsed(_tcscmp(pstrValue, _T("true")) == 0);
 	else if( _tcscmp(pstrName, _T("virtualwnd")) == 0 ) SetVirtualWnd(pstrValue);
+    else if (_tcscmp(pstrName, _T("texttag")) == 0) SetTextTag(pstrValue);
+    else if (_tcscmp(pstrName, _T("tooltiptag")) == 0) SetToolTipTag(pstrValue);
 }
 
 CControlUI* CControlUI::ApplyAttributeList(LPCTSTR pstrList)
@@ -1233,6 +1235,22 @@ void CControlUI::SetOwnerDraw(void* pOwnerDrawFun, void* pOwnerDrawParam)
 {
     m_OwnerDrawFun = (OwnerDraw)pOwnerDrawFun;
     m_pOwnerDrawParam = pOwnerDrawParam;
+}
+
+void CControlUI::SetTextTag(LPCTSTR pstrTextTag)
+{
+    CDuiString sText = CPaintManagerUI::GetTextByTag(pstrTextTag);
+    if (!sText.IsEmpty()) {
+        m_sText = sText;
+    }
+}
+
+void CControlUI::SetToolTipTag(LPCTSTR pstrToolTipTag)
+{
+    CDuiString sText = CPaintManagerUI::GetTextByTag(pstrToolTipTag);
+    if (!sText.IsEmpty()) {
+        m_sToolTip = sText;
+    }
 }
 
 } // namespace DuiLib
