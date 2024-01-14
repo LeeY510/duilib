@@ -62,6 +62,9 @@ namespace DuiLib
         DWORD GetTipValueColor();
         CDuiString GetTipValue();
 
+    private:
+        void SetTipTag(LPCTSTR pstrTipTag);
+
 	protected:
 		CEditWnd* m_pWindow;
 

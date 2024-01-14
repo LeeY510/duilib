@@ -483,6 +483,7 @@ namespace DuiLib
 		}
         else if (_tcscmp(pstrName, _T("tipvalue")) == 0) SetTipValue(pstrValue);
         else if (_tcscmp(pstrName, _T("tipvaluecolor")) == 0) SetTipValueColor(pstrValue);
+        else if (_tcscmp(pstrName, _T("tiptag")) == 0) SetTipTag(pstrValue);
 		else CLabelUI::SetAttribute(pstrName, pstrValue);
 	}
 
@@ -587,6 +588,14 @@ namespace DuiLib
     CDuiString CEditUI::GetTipValue()
     {
         return m_sTipValue;
+    }
+
+    void CEditUI::SetTipTag(LPCTSTR pstrTipTag)
+    {
+        CDuiString sText = CPaintManagerUI::GetTextByTag(pstrTipTag);
+        if (!sText.IsEmpty()) {
+            m_sTipValue = sText;
+        }
     }
 
 }
